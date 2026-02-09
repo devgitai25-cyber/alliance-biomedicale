@@ -1,0 +1,210 @@
+'use client';
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/Button';
+
+export default function SettingsPage() {
+    const [activeTab, setActiveTab] = useState<'general' | 'payment' | 'shipping'>('general');
+    const [isSaving, setIsSaving] = useState(false);
+
+    const [settings, setSettings] = useState({
+        siteName: 'Alliance Biomédicale',
+        siteEmail: 'contact@alliancebiomedical.com',
+        sitePhone: '+216 XX XXX XXX',
+        currency: 'TND',
+        shippingCost: 7,
+        freeShippingThreshold: 100,
+        paymeeApiKey: '',
+    });
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setSettings(prev => ({
+            ...prev,
+            [name]: name.includes('Cost') || name.includes('Threshold') ? parseFloat(value) || 0 : value
+        }));
+    };
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        // TODO: Implement actual save to backend
+        setTimeout(() => {
+            setIsSaving(false);
+            alert('Settings saved successfully!');
+        }, 1000);
+    };
+
+    return (
+        <div className="p-8">
+            <h1 className="text-3xl font-bold mb-6">Settings</h1>
+
+            {/* Tabs */}
+            <div className="border-b border-gray-200 mb-6">
+                <nav className="-mb-px flex space-x-8">
+                    <button
+                        onClick={() => setActiveTab('general')}
+                        className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'general'
+                                ? 'border-primary text-primary'
+                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            }`}
+                    >
+                        General
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('shipping')}
+                        className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'shipping'
+                                ? 'border-primary text-primary'
+                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            }`}
+                    >
+                        Shipping
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('payment')}
+                        className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'payment'
+                                ? 'border-primary text-primary'
+                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            }`}
+                    >
+                        Payment
+                    </button>
+                </nav>
+            </div>
+
+            {/* General Settings */}
+            {activeTab === 'general' && (
+                <div className="bg-white rounded-lg shadow p-6 max-w-2xl">
+                    <h2 className="text-xl font-semibold mb-4">General Settings</h2>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Site Name
+                            </label>
+                            <input
+                                type="text"
+                                name="siteName"
+                                value={settings.siteName}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Contact Email
+                            </label>
+                            <input
+                                type="email"
+                                name="siteEmail"
+                                value={settings.siteEmail}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Phone Number
+                            </label>
+                            <input
+                                type="tel"
+                                name="sitePhone"
+                                value={settings.sitePhone}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Currency
+                            </label>
+                            <select
+                                name="currency"
+                                value={settings.currency}
+                                onChange={(e) => setSettings(prev => ({ ...prev, currency: e.target.value }))}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                            >
+                                <option value="TND">Tunisian Dinar (TND)</option>
+                                <option value="EUR">Euro (EUR)</option>
+                                <option value="USD">US Dollar (USD)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Shipping Settings */}
+            {activeTab === 'shipping' && (
+                <div className="bg-white rounded-lg shadow p-6 max-w-2xl">
+                    <h2 className="text-xl font-semibold mb-4">Shipping Settings</h2>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Shipping Cost (TND)
+                            </label>
+                            <input
+                                type="number"
+                                name="shippingCost"
+                                value={settings.shippingCost}
+                                onChange={handleChange}
+                                min="0"
+                                step="0.1"
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Standard shipping fee charged to customers</p>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Free Shipping Threshold (TND)
+                            </label>
+                            <input
+                                type="number"
+                                name="freeShippingThreshold"
+                                value={settings.freeShippingThreshold}
+                                onChange={handleChange}
+                                min="0"
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Orders above this amount get free shipping</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Payment Settings */}
+            {activeTab === 'payment' && (
+                <div className="bg-white rounded-lg shadow p-6 max-w-2xl">
+                    <h2 className="text-xl font-semibold mb-4">Payment Settings</h2>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Paymee API Key
+                            </label>
+                            <input
+                                type="password"
+                                name="paymeeApiKey"
+                                value={settings.paymeeApiKey}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="Enter your Paymee API key"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">
+                                Your Paymee API key for payment processing
+                            </p>
+                        </div>
+                        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                            <p className="text-sm text-yellow-800">
+                                ⚠️ Keep your API keys secure. Never share them publicly.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Save Button */}
+            <div className="mt-6">
+                <Button onClick={handleSave} isLoading={isSaving}>
+                    Save Settings
+                </Button>
+            </div>
+        </div>
+    );
+}
