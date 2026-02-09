@@ -6,20 +6,20 @@ export declare class SettingsController {
     getPublicSettings(): Promise<{}>;
     getAllSettings(): Promise<{
         id: string;
-        key: string;
-        value: import("@prisma/client/runtime/library").JsonValue;
-        description: string | null;
-        isPublic: boolean;
         createdAt: Date;
         updatedAt: Date;
+        description: string | null;
+        value: import("@prisma/client/runtime/library").JsonValue;
+        isPublic: boolean;
+        key: string;
     }[]>;
     update(key: string, updateSettingDto: UpdateSettingDto): Promise<{
         id: string;
-        key: string;
-        value: import("@prisma/client/runtime/library").JsonValue;
-        description: string | null;
-        isPublic: boolean;
         createdAt: Date;
         updatedAt: Date;
+        description: string | null;
+        value: import("@prisma/client/runtime/library").JsonValue;
+        isPublic: boolean;
+        key: string;
     }>;
 }

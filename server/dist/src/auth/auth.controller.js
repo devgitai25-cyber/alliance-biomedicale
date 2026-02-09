@@ -33,7 +33,7 @@ let AuthController = class AuthController {
     async googleAuthRedirect(req, res) {
         const { accessToken } = req.user;
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-        res.redirect(`${frontendUrl}/fr/auth/callback?token=${accessToken}`);
+        res.redirect(`${frontendUrl}/fr/callback?token=${accessToken}`);
     }
     async getAllUsers() {
         return this.authService.getAllUsers();

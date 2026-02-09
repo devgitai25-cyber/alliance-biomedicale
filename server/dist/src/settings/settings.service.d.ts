@@ -5,30 +5,30 @@ export declare class SettingsService {
     constructor(prisma: PrismaService);
     findAll(): Promise<{
         id: string;
-        key: string;
-        value: import("@prisma/client/runtime/library").JsonValue;
-        description: string | null;
-        isPublic: boolean;
         createdAt: Date;
         updatedAt: Date;
+        description: string | null;
+        value: import("@prisma/client/runtime/library").JsonValue;
+        isPublic: boolean;
+        key: string;
     }[]>;
     findPublic(): Promise<{}>;
     findOne(key: string): Promise<{
         id: string;
-        key: string;
-        value: import("@prisma/client/runtime/library").JsonValue;
-        description: string | null;
-        isPublic: boolean;
         createdAt: Date;
         updatedAt: Date;
+        description: string | null;
+        value: import("@prisma/client/runtime/library").JsonValue;
+        isPublic: boolean;
+        key: string;
     }>;
     update(key: string, updateSettingDto: UpdateSettingDto): Promise<{
         id: string;
-        key: string;
-        value: import("@prisma/client/runtime/library").JsonValue;
-        description: string | null;
-        isPublic: boolean;
         createdAt: Date;
         updatedAt: Date;
+        description: string | null;
+        value: import("@prisma/client/runtime/library").JsonValue;
+        isPublic: boolean;
+        key: string;
     }>;
 }
