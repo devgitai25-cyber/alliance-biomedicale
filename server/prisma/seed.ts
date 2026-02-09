@@ -1,0 +1,562 @@
+import { PrismaClient, Category } from '@prisma/client';
+import * as bcrypt from 'bcryptjs';
+
+const prisma = new PrismaClient();
+
+async function main() {
+    console.log('🌱 Starting database seed...');
+
+    // Create Admin User
+    const adminEmail = 'admin@bioeco.com';
+    const adminPassword = 'admin123';
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
+
+    const admin = await prisma.user.upsert({
+        where: { email: adminEmail },
+        update: {},
+        create: {
+            email: adminEmail,
+            firstName: 'Admin',
+            lastName: 'Alliance Biomédicale',
+            password: hashedPassword,
+            phone: '+216 71 123 456',
+            isAdmin: true,
+        },
+    });
+
+    console.log('✅ Admin user created:', admin.email);
+
+    // Create Test User
+    const testUser = await prisma.user.upsert({
+        where: { email: 'user@test.com' },
+        update: {},
+        create: {
+            email: 'user@test.com',
+            firstName: 'Sarah',
+            lastName: 'Benali',
+            password: await bcrypt.hash('test123', 10),
+            phone: '+216 98 765 432',
+            isAdmin: false,
+        },
+    });
+
+    console.log('✅ Test user created:', testUser.email);
+
+    // Create Categories
+    const categoriesData = [
+        {
+            slug: 'soins-visage',
+            name: 'Soins Visage',
+            description: 'Crèmes, sérums et soins pour le visage',
+            displayOrder: 1,
+        },
+        {
+            slug: 'soins-corps',
+            name: 'Soins Corps',
+            description: 'Lotions, huiles et soins corporels',
+            displayOrder: 2,
+        },
+        {
+            slug: 'soins-capillaires',
+            name: 'Soins Capillaires',
+            description: 'Shampoings, masques et soins pour cheveux',
+            displayOrder: 3,
+        },
+        {
+            slug: 'coffrets-cadeaux',
+            name: 'Coffrets Cadeaux',
+            description: 'Coffrets et ensembles cadeaux',
+            displayOrder: 4,
+        },
+        {
+            slug: 'gamme-bebe',
+            name: 'Gamme Bébé',
+            description: 'Produits doux pour bébés et enfants',
+            displayOrder: 5,
+        },
+        {
+            slug: 'anti-age',
+            name: 'Anti-Âge',
+            description: 'Soins anti-âge et raffermissants',
+            displayOrder: 6,
+        },
+    ];
+
+    const categories: Category[] = [];
+    for (const catData of categoriesData) {
+        const category = await prisma.category.upsert({
+            where: { slug: catData.slug },
+            update: catData,
+            create: catData,
+        });
+        categories.push(category);
+    }
+
+    console.log(`✅ Created ${categories.length} categories`);
+
+    // Create Products
+    const productsData = [
+        // Soins Visage
+        {
+            categorySlug: 'soins-visage',
+            slug: 'serum-vitamine-c',
+            sku: 'AB-SV-001',
+            price: 45.00,
+            comparePrice: 55.00,
+            stock: 50,
+            featured: true,
+            tags: ['sérum', 'vitamine C', 'éclat', 'anti-taches'],
+            name: 'Sérum Vitamine C Éclatant',
+            shortDescription: 'Sérum concentré pour un teint lumineux',
+            description: 'Notre sérum à la vitamine C pure illumine votre teint et réduit les taches pigmentaires. Formule légère et rapidement absorbée.',
+            ingredients: 'Vitamine C pure 15%, Acide hyaluronique, Aloe vera bio',
+            usage: 'Appliquer 3-4 gouttes matin et soir sur peau propre avant votre crème.',
+        },
+        {
+            categorySlug: 'soins-visage',
+            slug: 'creme-hydratante-jour',
+            sku: 'AB-SV-002',
+            price: 38.00,
+            stock: 75,
+            featured: true,
+            tags: ['crème', 'hydratation', 'SPF', 'jour'],
+            name: 'Crème Hydratante Jour SPF30',
+            shortDescription: 'Protection et hydratation 24h',
+            description: 'Crème légère qui hydrate intensément tout en protégeant votre peau des UV. Texture non grasse, fini mat.',
+            ingredients: 'Filtres UV minéraux, Beurre de karité, Vitamine E',
+            usage: 'Appliquer généreusement le matin sur visage et cou.',
+        },
+        // Soins Corps
+        {
+            categorySlug: 'soins-corps',
+            slug: 'lait-corporel-argan',
+            sku: 'AB-SC-001',
+            price: 32.00,
+            stock: 100,
+            featured: false,
+            tags: ['lait corporel', 'argan', 'hydratation', 'bio'],
+            name: 'Lait Corporel à l\'Huile d\'Argan',
+            shortDescription: 'Hydratation intense et durable',
+            description: 'Lait corporel enrichi en huile d\'argan bio qui nourrit et adoucit votre peau. Pénètre rapidement sans laisser de film gras.',
+            ingredients: 'Huile d\'argan bio 20%, Beurre de cacao, Glycérine végétale',
+            usage: 'Appliquer quotidiennement sur peau propre et sèche.',
+        },
+        // Soins Capillaires
+        {
+            categorySlug: 'soins-capillaires',
+            slug: 'shampoing-reparateur',
+            sku: 'AB-SH-001',
+            price: 28.00,
+            stock: 80,
+            featured: true,
+            tags: ['shampoing', 'réparation', 'cheveux abîmés', 'kératine'],
+            name: 'Shampoing Réparateur à la Kératine',
+            shortDescription: 'Répare et fortifie les cheveux abîmés',
+            description: 'Shampoing doux enrichi en kératine végétale qui répare les cheveux abîmés et prévient la casse. Pour tous types de cheveux.',
+            ingredients: 'Kératine végétale, Protéines de soie, Huile de coco',
+            usage: 'Appliquer sur cheveux mouillés, masser, laisser poser 2 min, rincer.',
+        },
+        // Gamme Bébé
+        {
+            categorySlug: 'gamme-bebe',
+            slug: 'creme-change-bebe',
+            sku: 'AB-BB-001',
+            price: 22.00,
+            stock: 60,
+            featured: false,
+            tags: ['bébé', 'crème', 'change', 'hypoallergénique'],
+            name: 'Crème de Change Bébé',
+            shortDescription: 'Protection douce contre les rougeurs',
+            description: 'Crème protectrice qui forme une barrière contre l\'humidité. Apaise les irritations et rougeurs. Testée dermatologiquement.',
+            ingredients: 'Oxyde de zinc, Calendula bio, Camomille',
+            usage: 'Appliquer à chaque change sur peau propre et sèche.',
+        },
+        // Anti-Âge
+        {
+            categorySlug: 'anti-age',
+            slug: 'creme-nuit-anti-age',
+            sku: 'AB-AA-001',
+            price: 52.00,
+            comparePrice: 65.00,
+            stock: 40,
+            featured: true,
+            tags: ['anti-âge', 'crème de nuit', 'rétinol', 'raffermissant'],
+            name: 'Crème de Nuit Anti-Âge Intensive',
+            shortDescription: 'Régénération nocturne intensive',
+            description: 'Crème riche qui agit pendant la nuit pour réduire rides et ridules. Raffermit et redensifie la peau.',
+            ingredients: 'Rétinol encapsulé, Peptides, Huile de rose musquée',
+            usage: 'Appliquer le soir sur visage et cou propres.',
+        },
+        // More Soins Visage
+        {
+            categorySlug: 'soins-visage',
+            slug: 'masque-purifiant-argile',
+            sku: 'AB-SV-003',
+            price: 29.00,
+            stock: 65,
+            featured: false,
+            tags: ['masque', 'argile', 'purifiant', 'pores'],
+            name: 'Masque Purifiant à l\'Argile Verte',
+            shortDescription: 'Nettoie en profondeur et resserre les pores',
+            description: 'Masque à l\'argile verte qui absorbe l\'excès de sébum et élimine les impuretés. Idéal pour peaux mixtes à grasses.',
+            ingredients: 'Argile verte française, Charbon actif, Huile d\'arbre à thé',
+            usage: 'Appliquer en couche épaisse, laisser poser 10-15 min, rincer à l\'eau tiède. 1-2 fois par semaine.',
+        },
+        {
+            categorySlug: 'soins-visage',
+            slug: 'eau-micellaire-bio',
+            sku: 'AB-SV-004',
+            price: 24.00,
+            stock: 90,
+            featured: false,
+            tags: ['eau micellaire', 'démaquillant', 'bio', 'doux'],
+            name: 'Eau Micellaire Bio Tout-en-Un',
+            shortDescription: 'Démaquille, nettoie et tonifie en un geste',
+            description: 'Eau micellaire à base d\'ingrédients bio qui élimine maquillage et impuretés sans rinçage. Convient à tous types de peaux, même sensibles.',
+            ingredients: 'Eau florale de rose, Micelles végétales, Aloe vera',
+            usage: 'Appliquer sur coton, passer délicatement sur visage et yeux. Pas de rinçage nécessaire.',
+        },
+        {
+            categorySlug: 'soins-visage',
+            slug: 'contour-yeux-peptides',
+            sku: 'AB-SV-005',
+            price: 42.00,
+            stock: 55,
+            featured: true,
+            tags: ['contour des yeux', 'peptides', 'anti-cernes', 'anti-poches'],
+            name: 'Contour des Yeux aux Peptides',
+            shortDescription: 'Réduit cernes, poches et rides',
+            description: 'Soin ciblé enrichi en peptides et caféine qui décongestionne le regard. Texture légère à absorption rapide.',
+            ingredients: 'Peptides anti-âge, Caféine, Vitamine K, Acide hyaluronique',
+            usage: 'Tapoter délicatement autour des yeux matin et soir.',
+        },
+        {
+            categorySlug: 'soins-visage',
+            slug: 'gel-nettoyant-doux',
+            sku: 'AB-SV-006',
+            price: 26.00,
+            stock: 85,
+            featured: false,
+            tags: ['gel nettoyant', 'doux', 'quotidien', 'pH neutre'],
+            name: 'Gel Nettoyant Doux pH Neutre',
+            shortDescription: 'Nettoie sans dessécher',
+            description: 'Gel nettoyant ultra-doux qui respecte le pH naturel de la peau. Élimine impuretés et maquillage léger sans agresser.',
+            ingredients: 'Glycérine végétale, Extrait de concombre, Prébiotiques',
+            usage: 'Masser sur peau humide matin et soir, rincer abondamment.',
+        },
+        // More Soins Corps
+        {
+            categorySlug: 'soins-corps',
+            slug: 'gommage-corps-sucre',
+            sku: 'AB-SC-002',
+            price: 34.00,
+            stock: 70,
+            featured: false,
+            tags: ['gommage', 'exfoliant', 'sucre', 'nourrissant'],
+            name: 'Gommage Corps au Sucre et Huiles',
+            shortDescription: 'Exfolie et nourrit intensément',
+            description: 'Gommage gourmand qui élimine les cellules mortes et laisse la peau douce comme de la soie. Aux huiles précieuses.',
+            ingredients: 'Sucre de canne bio, Huile d\'amande douce, Huile de coco, Vitamine E',
+            usage: 'Masser sur peau humide en mouvements circulaires, rincer. 1-2 fois par semaine.',
+        },
+        {
+            categorySlug: 'soins-corps',
+            slug: 'huile-seche-scintillante',
+            sku: 'AB-SC-003',
+            price: 38.00,
+            stock: 45,
+            featured: true,
+            tags: ['huile sèche', 'scintillante', 'été', 'sublimateur'],
+            name: 'Huile Sèche Scintillante',
+            shortDescription: 'Sublime et fait briller la peau',
+            description: 'Huile sèche aux micro-paillettes dorées qui nourrit et illumine la peau. Parfaite pour l\'été. Absorption instantanée.',
+            ingredients: 'Huile de jojoba, Huile de macadamia, Micas naturels, Parfum monoï',
+            usage: 'Vaporiser sur corps et cheveux pour un effet lumineux.',
+        },
+        {
+            categorySlug: 'soins-corps',
+            slug: 'baume-corporel-karite',
+            sku: 'AB-SC-004',
+            price: 36.00,
+            stock: 50,
+            featured: false,
+            tags: ['baume', 'karité', 'réparateur', 'peaux sèches'],
+            name: 'Baume Corporel Réparateur au Karité',
+            shortDescription: 'Répare les peaux très sèches',
+            description: 'Baume riche au beurre de karité bio qui répare intensément les zones sèches et rugueuses. Texture fondante.',
+            ingredients: 'Beurre de karité bio 40%, Beurre de cacao, Huile d\'avocat',
+            usage: 'Appliquer sur zones sèches (coudes, genoux, talons) au besoin.',
+        },
+        // More Soins Capillaires
+        {
+            categorySlug: 'soins-capillaires',
+            slug: 'masque-capillaire-argan',
+            sku: 'AB-SH-002',
+            price: 32.00,
+            stock: 60,
+            featured: false,
+            tags: ['masque', 'argan', 'nutrition', 'brillance'],
+            name: 'Masque Capillaire Nutrition Intense à l\'Argan',
+            shortDescription: 'Nourrit et fait briller',
+            description: 'Masque ultra-nourrissant à l\'huile d\'argan qui répare les cheveux abîmés et redonne brillance et douceur.',
+            ingredients: 'Huile d\'argan 25%, Beurre de karité, Protéines de blé',
+            usage: 'Appliquer sur cheveux lavés, laisser poser 5-10 min, rincer.',
+        },
+        {
+            categorySlug: 'soins-capillaires',
+            slug: 'serum-anti-frisottis',
+            sku: 'AB-SH-003',
+            price: 35.00,
+            stock: 75,
+            featured: true,
+            tags: ['sérum', 'anti-frisottis', 'lissant', 'brillance'],
+            name: 'Sérum Anti-Frisottis Lissant',
+            shortDescription: 'Contrôle les frisottis et lisse',
+            description: 'Sérum léger qui discipline les cheveux rebelles et élimine les frisottis. Effet anti-humidité longue durée.',
+            ingredients: 'Huile d\'argan, Silicones végétales, Huile de pracaxi',
+            usage: 'Appliquer 2-3 gouttes sur cheveux secs ou humides, sans rinçage.',
+        },
+        {
+            categorySlug: 'soins-capillaires',
+            slug: 'spray-volume-racines',
+            sku: 'AB-SH-004',
+            price: 27.00,
+            stock: 80,
+            featured: false,
+            tags: ['spray', 'volume', 'racines', 'cheveux fins'],
+            name: 'Spray Volume Racines',
+            shortDescription: 'Donne du volume dès les racines',
+            description: 'Spray volumateur qui soulève les racines et donne du corps aux cheveux fins. Tenue longue durée sans effet carton.',
+            ingredients: 'Protéines de riz, Panthénol, Polymères naturels',
+            usage: 'Vaporiser sur racines de cheveux humides, sécher en soulevant.',
+        },
+        // Coffrets Cadeaux
+        {
+            categorySlug: 'coffrets-cadeaux',
+            slug: 'coffret-rituel-visage',
+            sku: 'AB-CG-001',
+            price: 95.00,
+            comparePrice: 115.00,
+            stock: 30,
+            featured: true,
+            tags: ['coffret', 'cadeau', 'visage', 'rituel complet'],
+            name: 'Coffret Rituel Visage Complet',
+            shortDescription: 'Routine visage 4 étapes',
+            description: 'Coffret luxueux contenant gel nettoyant, sérum vitamine C, crème hydratante et masque purifiant. Le cadeau parfait.',
+            ingredients: 'Voir produits individuels',
+            usage: 'Routine complète matin et soir pour une peau éclatante.',
+        },
+        {
+            categorySlug: 'coffrets-cadeaux',
+            slug: 'coffret-argan-precieux',
+            sku: 'AB-CG-002',
+            price: 78.00,
+            stock: 25,
+            featured: false,
+            tags: ['coffret', 'argan', 'luxe', 'corps & cheveux'],
+            name: 'Coffret Argan Précieux',
+            shortDescription: 'Argan corps et cheveux',
+            description: 'Collection à l\'huile d\'argan : lait corporel, masque cheveux et huile sèche. Dans un écrin élégant.',
+            ingredients: 'Huile d\'argan bio certifiée',
+            usage: 'Soin complet corps et cheveux à l\'argan.',
+        },
+        {
+            categorySlug: 'coffrets-cadeaux',
+            slug: 'coffret-duo-maman-bebe',
+            sku: 'AB-CG-003',
+            price: 68.00,
+            stock: 35,
+            featured: true,
+            tags: ['coffret', 'maman', 'bébé', 'naissance'],
+            name: 'Coffret Duo Maman & Bébé',
+            shortDescription: 'Cadeau naissance parfait',
+            description: 'Coffret tendre avec soins pour maman (crème anti-vergetures) et bébé (crème de change, gel lavant doux).',
+            ingredients: 'Formules hypoallergéniques',
+            usage: 'Idéal pour jeunes mamans et nouveau-nés.',
+        },
+        // More Gamme Bébé
+        {
+            categorySlug: 'gamme-bebe',
+            slug: 'gel-lavant-bebe-doux',
+            sku: 'AB-BB-002',
+            price: 18.00,
+            stock: 95,
+            featured: false,
+            tags: ['bébé', 'gel lavant', 'doux', '2-en-1'],
+            name: 'Gel Lavant Bébé Doux 2-en-1',
+            shortDescription: 'Corps et cheveux ultra-doux',
+            description: 'Gel lavant sans savon qui nettoie délicatement peau et cheveux de bébé. Formule sans larmes, testée pédiatriquement.',
+            ingredients: 'Base lavante douce, Calendula, Camomille, Sans sulfates',
+            usage: 'Appliquer sur peau et cheveux mouillés, rincer. Dès la naissance.',
+        },
+        {
+            categorySlug: 'gamme-bebe',
+            slug: 'lait-hydratant-bebe',
+            sku: 'AB-BB-003',
+            price: 20.00,
+            stock: 70,
+            featured: false,
+            tags: ['bébé', 'lait corporel', 'hydratation', 'bio'],
+            name: 'Lait Hydratant Bébé Bio',
+            shortDescription: 'Hydrate et protège la peau délicate',
+            description: 'Lait corporel enrichi en ingrédients bio qui hydrate et protège la peau fragile de bébé. Texture fluide non grasse.',
+            ingredients: 'Aloe vera bio, Beurre de karité, Huile d\'amande douce, Calendula',
+            usage: 'Masser sur peau propre après le bain.',
+        },
+        {
+            categorySlug: 'gamme-bebe',
+            slug: 'huile-massage-bebe',
+            sku: 'AB-BB-004',
+            price: 25.00,
+            stock: 55,
+            featured: true,
+            tags: ['bébé', 'huile', 'massage', 'relaxante'],
+            name: 'Huile de Massage Bébé Relaxante',
+            shortDescription: 'Apaise et favorise le sommeil',
+            description: 'Huile douce aux extraits de lavande et camomille pour masser bébé. Favorise la détente et le sommeil.',
+            ingredients: 'Huile d\'amande douce, Huile de jojoba, Lavande, Camomille',
+            usage: 'Réchauffer dans les mains, masser délicatement bébé avant le coucher.',
+        },
+        // More Anti-Âge
+        {
+            categorySlug: 'anti-age',
+            slug: 'serum-retinol-pur',
+            sku: 'AB-AA-002',
+            price: 58.00,
+            stock: 35,
+            featured: true,
+            tags: ['anti-âge', 'rétinol', 'sérum', 'rides'],
+            name: 'Sérum Rétinol Pur 0.5%',
+            shortDescription: 'Action anti-rides puissante',
+            description: 'Sérum concentré au rétinol pur qui stimule le renouvellement cellulaire et réduit visiblement rides et ridules.',
+            ingredients: 'Rétinol pur 0.5%, Squalane, Vitamine E',
+            usage: 'Appliquer le soir uniquement. Commencer 2 fois par semaine. Utiliser SPF le jour.',
+        },
+        {
+            categorySlug: 'anti-age',
+            slug: 'creme-jour-spf50',
+            sku: 'AB-AA-003',
+            price: 48.00,
+            stock: 60,
+            featured: false,
+            tags: ['anti-âge', 'SPF50', 'jour', 'protection'],
+            name: 'Crème Jour Anti-Âge SPF50',
+            shortDescription: 'Protection solaire maximale anti-âge',
+            description: 'Crème de jour qui protège contre le vieillissement cutané avec SPF50. Prévient rides et taches pigmentaires.',
+            ingredients: 'Filtres UV haute protection, Peptides, Niacinamide, Antioxydants',
+            usage: 'Appliquer généreusement chaque matin. Réappliquer toutes les 2h en cas d\'exposition.',
+        },
+        {
+            categorySlug: 'anti-age',
+            slug: 'masque-eclat-peeling',
+            sku: 'AB-AA-004',
+            price: 44.00,
+            stock: 45,
+            featured: false,
+            tags: ['anti-âge', 'masque', 'peeling', 'éclat'],
+            name: 'Masque Éclat Effet Peeling',
+            shortDescription: 'Exfolie et illumine instantanément',
+            description: 'Masque aux acides de fruits qui exfolie en douceur et révèle l\'éclat de la peau. Effet coup d\'éclat immédiat.',
+            ingredients: 'AHA (acides de fruits) 10%, Enzyme de papaye, Vitamine C',
+            usage: 'Appliquer en couche fine, laisser 10 min, rincer. 1-2 fois par semaine.',
+        },
+        {
+            categorySlug: 'anti-age',
+            slug: 'concentre-acide-hyaluronique',
+            sku: 'AB-AA-005',
+            price: 55.00,
+            stock: 50,
+            featured: true,
+            tags: ['anti-âge', 'acide hyaluronique', 'hydratation', 'repulpant'],
+            name: 'Concentré Acide Hyaluronique Triple Poids',
+            shortDescription: 'Repulpe et hydrate en profondeur',
+            description: 'Concentré à 3 poids moléculaires d\'acide hyaluronique qui hydrate à tous les niveaux de l\'épiderme. Effet repulpant immédiat.',
+            ingredients: 'Acide hyaluronique 2% (3 poids moléculaires), Glycérine, Vitamine B5',
+            usage: 'Appliquer quelques gouttes matin et soir avant votre crème.',
+        },
+    ];
+
+    let productsCreated = 0;
+    for (const productData of productsData) {
+        const category = categories.find(c => c.slug === productData.categorySlug);
+        if (!category) continue;
+
+        await prisma.product.upsert({
+            where: { slug: productData.slug },
+            update: {
+                slug: productData.slug,
+                sku: productData.sku,
+                price: productData.price,
+                comparePrice: productData.comparePrice,
+                stock: productData.stock,
+                images: [],
+                featured: productData.featured || false,
+                isBundle: false,
+                tags: productData.tags || [],
+                active: true,
+                categoryId: category.id,
+                name: productData.name,
+                shortDescription: productData.shortDescription,
+                description: productData.description,
+                ingredients: productData.ingredients,
+                usage: productData.usage,
+            },
+            create: {
+                slug: productData.slug,
+                sku: productData.sku,
+                price: productData.price,
+                comparePrice: productData.comparePrice,
+                stock: productData.stock,
+                images: [],
+                featured: productData.featured || false,
+                isBundle: false,
+                tags: productData.tags || [],
+                active: true,
+                categoryId: category.id,
+                name: productData.name,
+                shortDescription: productData.shortDescription,
+                description: productData.description,
+                ingredients: productData.ingredients,
+                usage: productData.usage,
+            },
+        });
+
+        productsCreated++;
+    }
+
+    console.log(`✅ Created ${productsCreated} products`);
+
+    // Create a sample promotion
+    const promotion = await prisma.promotion.upsert({
+        where: { code: 'WELCOME10' },
+        update: {},
+        create: {
+            code: 'WELCOME10',
+            description: 'Remise de 10% pour les nouveaux clients',
+            type: 'PERCENTAGE',
+            value: 10,
+            minPurchase: 30,
+            maxUses: 100,
+            usedCount: 0,
+            active: true,
+            expiresAt: new Date('2026-12-31'),
+        },
+    });
+
+    console.log('✅ Created promotion:', promotion.code);
+
+    console.log('\n🎉 Database seeding completed successfully!');
+    console.log('\n📝 Login credentials:');
+    console.log('   Admin: admin@bioeco.com / admin123');
+    console.log('   User: user@test.com / test123');
+    console.log('   Promo code: WELCOME10 (10% off)');
+}
+
+main()
+    .catch((e) => {
+        console.error('❌ Error seeding database:', e);
+        process.exit(1);
+    })
+    .finally(async () => {
+        await prisma.$disconnect();
+    });
