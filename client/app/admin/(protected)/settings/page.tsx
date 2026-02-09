@@ -1,21 +1,58 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
+import { getAllSettings, updateSetting } from '@/lib/api';
 
 export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState<'general' | 'payment' | 'shipping'>('general');
     const [isSaving, setIsSaving] = useState(false);
 
     const [settings, setSettings] = useState({
-        siteName: 'Alliance Biomédicale',
-        siteEmail: 'contact@alliancebiomedical.com',
-        sitePhone: '+216 XX XXX XXX',
+        siteName: '',
+        siteEmail: '',
+        sitePhone: '',
         currency: 'TND',
-        shippingCost: 7,
-        freeShippingThreshold: 100,
+        shippingCost: 0,
+        freeShippingThreshold: 0,
         paymeeApiKey: '',
     });
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const data = await getAllSettings();
+                // data is array of { key, value, ... }
+                const newSettings = { ...settings };
+                let hasChanges = false;
+
+                data.forEach(s => {
+                    const keyMap: Record<string, string> = {
+                        site_name: 'siteName',
+                        site_email: 'siteEmail',
+                        site_phone: 'sitePhone',
+                        shipping_cost: 'shippingCost',
+                        free_shipping_threshold: 'freeShippingThreshold',
+                        paymee_api_key: 'paymeeApiKey',
+                    };
+                    const stateKey = keyMap[s.key];
+                    // @ts-ignore
+                    if (stateKey && newSettings[stateKey] !== undefined) {
+                        // @ts-ignore
+                        newSettings[stateKey] = s.value;
+                        hasChanges = true;
+                    }
+                });
+
+                if (hasChanges) {
+                    setSettings(newSettings);
+                }
+            } catch (error) {
+                console.error("Failed to load settings", error);
+            }
+        };
+        fetchSettings();
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -27,11 +64,32 @@ export default function SettingsPage() {
 
     const handleSave = async () => {
         setIsSaving(true);
-        // TODO: Implement actual save to backend
-        setTimeout(() => {
-            setIsSaving(false);
+        try {
+            const keyMap: Record<string, string> = {
+                siteName: 'site_name',
+                siteEmail: 'site_email',
+                sitePhone: 'site_phone',
+                shippingCost: 'shipping_cost',
+                freeShippingThreshold: 'free_shipping_threshold',
+                paymeeApiKey: 'paymee_api_key',
+            };
+
+            const promises = Object.entries(settings).map(([key, value]) => {
+                const backendKey = keyMap[key];
+                if (backendKey) {
+                    return updateSetting(backendKey, value);
+                }
+                return Promise.resolve();
+            });
+
+            await Promise.all(promises);
             alert('Settings saved successfully!');
-        }, 1000);
+        } catch (error) {
+            console.error('Failed to save settings', error);
+            alert('Failed to save settings');
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
@@ -44,8 +102,8 @@ export default function SettingsPage() {
                     <button
                         onClick={() => setActiveTab('general')}
                         className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'general'
-                                ? 'border-primary text-primary'
-                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            ? 'border-primary text-primary'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                             }`}
                     >
                         General
@@ -53,8 +111,8 @@ export default function SettingsPage() {
                     <button
                         onClick={() => setActiveTab('shipping')}
                         className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'shipping'
-                                ? 'border-primary text-primary'
-                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            ? 'border-primary text-primary'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                             }`}
                     >
                         Shipping
@@ -62,8 +120,8 @@ export default function SettingsPage() {
                     <button
                         onClick={() => setActiveTab('payment')}
                         className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'payment'
-                                ? 'border-primary text-primary'
-                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            ? 'border-primary text-primary'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                             }`}
                     >
                         Payment

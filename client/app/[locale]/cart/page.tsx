@@ -1,6 +1,7 @@
 'use client';
 
 import { useCart } from '@/context/CartContext';
+import { useSettings } from '@/hooks/useSettings';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Container } from '@/components/ui/Container';
@@ -8,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 
 export default function CartPage() {
     const { items: cart, updateQuantity, removeItem: removeFromCart, subtotal: total } = useCart();
+    const { settings } = useSettings();
 
     if (cart.length === 0) {
         return (
@@ -42,7 +44,7 @@ export default function CartPage() {
         );
     }
 
-    const shippingCost = total >= 100 ? 0 : 7;
+    const shippingCost = total >= settings.freeShippingThreshold ? 0 : settings.shippingCost;
     const grandTotal = total + shippingCost;
 
     return (
@@ -168,10 +170,10 @@ export default function CartPage() {
                                     </span>
                                 </div>
 
-                                {total < 100 && (
+                                {total < settings.freeShippingThreshold && (
                                     <div className="bg-teal-soft/40 border border-teal-light/50 p-4 rounded-lg text-sm text-teal-dark font-body">
                                         <p className="font-medium">
-                                            Ajoutez {(100 - total).toFixed(2)} TND pour la livraison gratuite !
+                                            Ajoutez {(settings.freeShippingThreshold - total).toFixed(2)} TND pour la livraison gratuite !
                                         </p>
                                     </div>
                                 )}

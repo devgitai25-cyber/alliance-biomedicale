@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import '../globals.css';
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
+import { WishlistProvider } from '@/context/WishlistContext';
 import { CartDrawer } from '@/components/CartDrawer';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
@@ -26,10 +27,12 @@ export default async function LocaleLayout({
             <body className="min-h-screen">
                 <AuthProvider>
                     <CartProvider>
-                        <Navbar />
-                        {children}
-                        <Footer />
-                        <CartDrawer />
+                        <WishlistProvider>
+                            <Navbar />
+                            {children}
+                            <Footer />
+                            <CartDrawer />
+                        </WishlistProvider>
                     </CartProvider>
                 </AuthProvider>
             </body>

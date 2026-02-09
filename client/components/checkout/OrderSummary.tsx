@@ -4,10 +4,12 @@ import { useCart } from '@/context/CartContext';
 import Image from 'next/image';
 import { useState } from 'react';
 import { validatePromoCode } from '@/lib/api';
+import { useSettings } from '@/hooks/useSettings';
 
 
 export function OrderSummary() {
     const { items, subtotal, promoCode, promoDiscount, setPromo, clearPromo } = useCart();
+    const { settings } = useSettings();
     const [code, setCode] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -26,8 +28,8 @@ export function OrderSummary() {
         }
     };
 
-    // Default shipping cost (mock logic: free over 100 TND)
-    const shippingCost = subtotal > 100 ? 0 : 7.00;
+    // Dynamic shipping cost
+    const shippingCost = subtotal >= settings.freeShippingThreshold ? 0 : settings.shippingCost;
     const total = subtotal + shippingCost - promoDiscount;
 
     return (

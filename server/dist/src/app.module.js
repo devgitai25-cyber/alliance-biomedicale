@@ -18,6 +18,7 @@ const wishlist_module_1 = require("./wishlist/wishlist.module");
 const promotions_module_1 = require("./promotions/promotions.module");
 const categories_module_1 = require("./categories/categories.module");
 const dashboard_module_1 = require("./dashboard/dashboard.module");
+const settings_module_1 = require("./settings/settings.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -34,6 +35,7 @@ exports.AppModule = AppModule = __decorate([
             promotions_module_1.PromotionsModule,
             categories_module_1.CategoriesModule,
             dashboard_module_1.DashboardModule,
+            settings_module_1.SettingsModule,
         ],
         controllers: [],
         providers: [],

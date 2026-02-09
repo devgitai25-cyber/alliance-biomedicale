@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Product } from '@/types';
 import { useCart } from '@/context/CartContext';
-import { addToWishlist, removeFromWishlist, checkInWishlist } from '@/lib/api';
+import { useWishlist } from '@/context/WishlistContext';
 import { useRouter } from 'next/navigation';
 
 interface ProductActionsProps {
@@ -15,17 +15,11 @@ export function ProductActions({ product }: ProductActionsProps) {
     const [quantity, setQuantity] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
     const [isWishlistLoading, setIsWishlistLoading] = useState(false);
-    const [isInWishlist, setIsInWishlist] = useState(false);
     const { addItem } = useCart();
+    const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
     const router = useRouter();
 
-    useEffect(() => {
-        const checkWishlist = async () => {
-            const inList = await checkInWishlist(product.id);
-            setIsInWishlist(inList);
-        };
-        checkWishlist();
-    }, [product.id]);
+    const inWishlist = isInWishlist(product.id);
 
     const handleAddToCart = async () => {
         setIsLoading(true);
@@ -44,12 +38,10 @@ export function ProductActions({ product }: ProductActionsProps) {
 
         setIsWishlistLoading(true);
         try {
-            if (isInWishlist) {
+            if (inWishlist) {
                 await removeFromWishlist(product.id);
-                setIsInWishlist(false);
             } else {
                 await addToWishlist(product.id);
-                setIsInWishlist(true);
             }
         } catch (error) {
             console.error('Failed to toggle wishlist', error);
@@ -98,15 +90,15 @@ export function ProductActions({ product }: ProductActionsProps) {
                 <button
                     onClick={handleToggleWishlist}
                     disabled={isWishlistLoading}
-                    className={`px-5 rounded-lg border transition-all duration-300 flex items-center justify-center ${isInWishlist
+                    className={`px-5 rounded-lg border transition-all duration-300 flex items-center justify-center ${inWishlist
                         ? 'bg-red-50 border-red-200 text-red-500 shadow-inner'
                         : 'bg-white border-gray-light text-gray-400 hover:border-red-300 hover:text-red-400 hover:shadow-soft'
                         }`}
-                    title={isInWishlist ? "Retirer de la liste de souhaits" : "Ajouter à la liste de souhaits"}
+                    title={inWishlist ? "Retirer de la liste de souhaits" : "Ajouter à la liste de souhaits"}
                 >
                     <svg
-                        className={`w-6 h-6 transition-transform duration-300 ${isInWishlist ? 'scale-110 fill-current' : 'scale-100'}`}
-                        fill={isInWishlist ? "currentColor" : "none"}
+                        className={`w-6 h-6 transition-transform duration-300 ${inWishlist ? 'scale-110 fill-current' : 'scale-100'}`}
+                        fill={inWishlist ? "currentColor" : "none"}
                         stroke="currentColor"
                         strokeWidth="2"
                         viewBox="0 0 24 24"

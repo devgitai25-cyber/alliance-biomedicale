@@ -9,12 +9,14 @@ import { Container } from './ui/Container';
 import { Button } from './ui/Button';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
+import { useWishlist } from '@/context/WishlistContext';
 
 export function Navbar() {
     const pathname = usePathname();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { openCart, totalItems } = useCart();
     const { user, logout } = useAuth();
+    const { count: wishlistCount } = useWishlist();
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
@@ -34,7 +36,7 @@ export function Navbar() {
         { href: '/contact', label: 'Contact' },
     ];
 
-    if (!isMounted) return null;
+
 
     return (
         <nav className="glass-effect sticky top-0 z-50 border-b border-gray-light/50">
@@ -75,12 +77,17 @@ export function Navbar() {
                         {/* Wishlist Link - Subtle icon */}
                         <Link
                             href="/wishlist"
-                            className="p-2.5 hover:bg-teal-soft/50 rounded-lg transition-colors duration-300 text-gray-text hover:text-teal-main"
+                            className="relative p-2.5 hover:bg-teal-soft/50 rounded-lg transition-colors duration-300 text-gray-text hover:text-teal-main"
                             aria-label="Wishlist"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                             </svg>
+                            {isMounted && wishlistCount > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-teal-main text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center shadow-sm">
+                                    {wishlistCount}
+                                </span>
+                            )}
                         </Link>
 
                         {/* Cart Icon - Elegant with badge */}
@@ -92,7 +99,7 @@ export function Navbar() {
                             <svg className="w-5 h-5 text-gray-text" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                             </svg>
-                            {totalItems > 0 && (
+                            {isMounted && totalItems > 0 && (
                                 <span className="absolute -top-1 -right-1 bg-teal-main text-white text-xs font-display font-medium rounded-full h-5 w-5 flex items-center justify-center shadow-soft">
                                     {totalItems}
                                 </span>
@@ -100,7 +107,7 @@ export function Navbar() {
                         </button>
 
                         {/* User Menu / Login - Premium buttons */}
-                        {user ? (
+                        {isMounted && user ? (
                             <div className="hidden md:flex items-center gap-3">
                                 {user.isAdmin ? (
                                     <Link href="/admin">
@@ -126,13 +133,13 @@ export function Navbar() {
                                     </svg>
                                 </button>
                             </div>
-                        ) : (
+                        ) : isMounted ? (
                             <Link href="/login" className="hidden md:block">
                                 <Button size="sm" variant="primary">
                                     Connexion
                                 </Button>
                             </Link>
-                        )}
+                        ) : null}
 
                         {/* Mobile Menu Button */}
                         <button
@@ -152,7 +159,7 @@ export function Navbar() {
                 </div>
 
                 {/* Mobile Menu - Full Screen Luxury Overlay (Portal) */}
-                {mobileMenuOpen && typeof document !== 'undefined' && createPortal(
+                {isMounted && mobileMenuOpen && createPortal(
                     <div className="fixed inset-0 z-[100] bg-white animate-fade-in-up flex flex-col">
                         {/* Header */}
                         <div className="flex items-center justify-between p-6 border-b border-gray-light/50">

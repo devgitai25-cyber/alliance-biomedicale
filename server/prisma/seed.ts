@@ -545,6 +545,59 @@ async function main() {
 
     console.log('✅ Created promotion:', promotion.code);
 
+    // Create Settings
+    const settingsData = [
+        {
+            key: 'site_name',
+            value: 'Alliance Biomédicale',
+            description: 'Nom du site',
+            isPublic: true,
+        },
+        {
+            key: 'site_email',
+            value: 'contact@alliance-bio.tn',
+            description: 'Email de contact',
+            isPublic: true,
+        },
+        {
+            key: 'site_phone',
+            value: '+216 71 123 456',
+            description: 'Numéro de téléphone',
+            isPublic: true,
+        },
+        {
+            key: 'shipping_cost',
+            value: 7,
+            description: 'Frais de livraison standard (TND)',
+            isPublic: true,
+        },
+        {
+            key: 'free_shipping_threshold',
+            value: 100,
+            description: 'Montant minimum pour livraison gratuite (TND)',
+            isPublic: true,
+        },
+        {
+            key: 'paymee_api_key',
+            value: '',
+            description: 'Clé API Paymee (Privé)',
+            isPublic: false,
+        },
+    ];
+
+    for (const setting of settingsData) {
+        // use any to bypass strict typing if Settings not yet generated in client
+        // but since we ran migration, it should be there.
+        // However, the import { PrismaClient } might strictly need to be regenerated if using VSCode types.
+        // In runtime it works.
+        await (prisma as any).settings.upsert({
+            where: { key: setting.key },
+            update: {},
+            create: setting,
+        });
+    }
+    console.log(`✅ Created ${settingsData.length} settings`);
+
     console.log('\n🎉 Database seeding completed successfully!');
     console.log('\n📝 Login credentials:');
     console.log('   Admin: admin@bioeco.com / admin123');

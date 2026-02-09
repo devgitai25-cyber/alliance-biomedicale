@@ -427,3 +427,41 @@ export async function updateOrderStatus(
 
     return res.json();
 }
+
+// Settings
+export async function getPublicSettings(): Promise<Record<string, any>> {
+    try {
+        const res = await fetch(`${API_URL}/settings/public`, { cache: 'no-store' });
+        if (!res.ok) throw new Error('Failed to fetch settings');
+        return res.json();
+    } catch (error) {
+        console.error('getPublicSettings error:', error);
+        return {};
+    }
+}
+
+export async function getAllSettings(): Promise<any[]> {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const res = await fetch(`${API_URL}/settings`, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+        cache: 'no-store',
+    });
+    if (!res.ok) throw new Error('Failed to fetch settings');
+    return res.json();
+}
+
+export async function updateSetting(key: string, value: any): Promise<any> {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const res = await fetch(`${API_URL}/settings/${key}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ value }),
+    });
+    if (!res.ok) throw new Error('Failed to update setting');
+    return res.json();
+}

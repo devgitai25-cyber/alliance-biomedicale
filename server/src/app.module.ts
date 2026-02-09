@@ -9,6 +9,7 @@ import { WishlistModule } from './wishlist/wishlist.module';
 import { PromotionsModule } from './promotions/promotions.module';
 import { CategoriesModule } from './categories/categories.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     PromotionsModule,
     CategoriesModule,
     DashboardModule,
+    SettingsModule,
   ],
   controllers: [],
   providers: [],

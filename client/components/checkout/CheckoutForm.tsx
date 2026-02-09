@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 import { useCart } from '@/context/CartContext';
+import { useSettings } from '@/hooks/useSettings';
 import { useRouter } from 'next/navigation';
 import {
     validateEmail,
@@ -19,6 +20,7 @@ interface FormErrors {
 export function CheckoutForm() {
     const router = useRouter();
     const { items, subtotal, clearCart, promoCode, promoDiscount, refreshCart } = useCart();
+    const { settings } = useSettings();
     const [isLoading, setIsLoading] = useState(false);
     const [isVerifying, setIsVerifying] = useState(true);
     const [errors, setErrors] = useState<FormErrors>({});
@@ -141,7 +143,7 @@ export function CheckoutForm() {
             const roundAmount = (amount: number) => Math.round((amount + Number.EPSILON) * 100) / 100;
 
             const roundedSubtotal = roundAmount(subtotal);
-            const shippingCost = roundedSubtotal > 100 ? 0 : 7;
+            const shippingCost = roundedSubtotal >= settings.freeShippingThreshold ? 0 : settings.shippingCost;
             const finalTotal = roundAmount(roundedSubtotal + shippingCost - promoDiscount);
 
             const orderData = {
@@ -328,7 +330,7 @@ export function CheckoutForm() {
                             <p className="text-xs text-gray-medium uppercase tracking-wide mt-1">Livraison à domicile (24h - 48h)</p>
                         </div>
                     </div>
-                    <span className="font-bold text-dark">{subtotal > 100 ? 'Gratuite' : '7.00 TND'}</span>
+                    <span className="font-bold text-dark">{subtotal >= settings.freeShippingThreshold ? 'Gratuite' : `${settings.shippingCost.toFixed(2)} TND`}</span>
                 </div>
             </section>
 

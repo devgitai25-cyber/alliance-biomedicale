@@ -225,10 +225,25 @@ model Payment {
   @@index([paymeeId])
 }
 
+
+
 enum PaymentStatus {
   PENDING
   PROCESSING
   COMPLETED
   FAILED
   REFUNDED
+}
+
+// Settings model for site configuration
+model Settings {
+  id          String   @id @default(cuid())
+  key         String   @unique // e.g., 'site_contact', 'site_shipping'
+  value       Json     // Structured data for the setting
+  description String?  // Helper text for admin UI
+  isPublic    Boolean  @default(false) // Whether this setting is exposed to public API
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([key])
 }
