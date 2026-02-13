@@ -8,6 +8,9 @@ RUN npm ci
 FROM node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
+
+# Cache bust: change this value to force a fresh build
+ARG CACHEBUST=2
 COPY . .
 
 # Generate Prisma Client
