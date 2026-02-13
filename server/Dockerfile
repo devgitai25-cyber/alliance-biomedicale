@@ -10,7 +10,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 
 # Cache bust: change this value to force a fresh build
-ARG CACHEBUST=2
+ARG CACHEBUST=3
 COPY . .
 
 # Generate Prisma Client
