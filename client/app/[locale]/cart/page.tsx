@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
+import { resolveImageUrl } from '@/lib/image';
 
 export default function CartPage() {
     const { items: cart, updateQuantity, removeItem: removeFromCart, subtotal: total } = useCart();
@@ -79,10 +80,11 @@ export default function CartPage() {
                                 >
                                     {item.product.images?.length ? (
                                         <Image
-                                            src={item.product.images[0]}
+                                            src={resolveImageUrl(item.product.images[0])}
                                             alt={item.product.name}
                                             fill
                                             className="object-cover"
+                                            unoptimized
                                         />
                                     ) : (
                                         <div className="flex items-center justify-center h-full text-4xl text-teal-light/30">

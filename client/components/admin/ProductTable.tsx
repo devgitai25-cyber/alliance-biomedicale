@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/Button';
 import { Product } from '@/types';
+import { resolveImageUrl } from '@/lib/image';
 
 interface ProductTableProps {
     products: Product[];
@@ -64,8 +65,8 @@ export function ProductTable({ products, onDelete }: ProductTableProps) {
                     <button
                         onClick={() => setCategoryFilter('all')}
                         className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-colors ${categoryFilter === 'all'
-                                ? 'bg-teal-main text-white shadow-md'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            ? 'bg-teal-main text-white shadow-md'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                             }`}
                     >
                         Tout
@@ -75,8 +76,8 @@ export function ProductTable({ products, onDelete }: ProductTableProps) {
                             key={cat}
                             onClick={() => setCategoryFilter(cat)}
                             className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-colors ${categoryFilter === cat
-                                    ? 'bg-teal-main text-white shadow-md'
-                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                ? 'bg-teal-main text-white shadow-md'
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                 }`}
                         >
                             {cat}
@@ -119,11 +120,11 @@ export function ProductTable({ products, onDelete }: ProductTableProps) {
                                         <div className="relative w-10 h-10 bg-gray-100 rounded-md overflow-hidden flex-shrink-0 border border-gray-200">
                                             {product.images && product.images[0] && (
                                                 <Image
-                                                    src={product.images[0]}
+                                                    src={resolveImageUrl(product.images[0])}
                                                     alt={product.name}
                                                     fill
                                                     className="object-cover"
-                                                    unoptimized={product.images[0].startsWith('http')}
+                                                    unoptimized
                                                 />
                                             )}
                                             {(!product.images || product.images.length === 0) && (

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { resolveImageUrl } from '@/lib/image';
 
 interface ProductCardProps {
     id: string;
@@ -38,10 +39,11 @@ export function ProductCard({
             <div className="relative aspect-[3/4] bg-white overflow-hidden">
                 {image ? (
                     <Image
-                        src={image}
+                        src={resolveImageUrl(image)}
                         alt={name}
                         fill
                         className="object-cover group-hover:scale-103 transition-transform duration-500 ease-out"
+                        unoptimized
                     />
                 ) : (
                     <div className="absolute inset-0 flex items-center justify-center text-5xl text-gray-light/50">

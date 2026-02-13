@@ -16,13 +16,13 @@ import { ProductsService } from './products.service';
 import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
 import { JwtAuthGuard } from '../auth/guards/auth.guard';
 import { AdminGuard } from '../auth/guards/auth.guard';
-import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { UploadService } from '../upload/upload.service';
 
 @Controller('products')
 export class ProductsController {
     constructor(
         private readonly productsService: ProductsService,
-        private readonly cloudinaryService: CloudinaryService,
+        private readonly uploadService: UploadService,
     ) { }
 
     @Post()
@@ -34,8 +34,8 @@ export class ProductsController {
     ) {
         let imageUrl = '';
         if (file) {
-            const result = await this.cloudinaryService.uploadImage(file);
-            imageUrl = result.secure_url;
+            const result = await this.uploadService.uploadImage(file);
+            imageUrl = result.url;
         }
 
         // Add image to DTO if it exists
@@ -87,38 +87,18 @@ export class ProductsController {
         @UploadedFile() file: Express.Multer.File,
     ) {
         if (file) {
-            const result = await this.cloudinaryService.uploadImage(file);
-            // Append new image to existing images or replace? 
-            // For simplicity in this iteration, let's just add it to the list
-            // Note: In a real app, we might want to manage specific images (delete old one etc)
-            // But here we'd need to fetch existing first or just trust the DTO + new file
-
-            // If DTO has images, use those + new file
-            // The DTO images might be JSON string due to FormData limitation, from frontend we usually send array
-            // But if it comes as form-data, complex arrays might be messy.
-
-            // For now, assuming we want to overwrite or add to existing if managed by client logic.
-            // Simplified logic: treat the uploaded file as the ONLY image or primary image if we were replacing.
-            // But code above just pushes to array if provided.
-
-            // Let's just create an array with this image for now if images is empty, or push to it.
-            // Since we receive a DTO, we should respect it.
-            // But typically update with file upload might be tricky with DTO validation.
-
-            // Ideally:
+            const result = await this.uploadService.uploadImage(file);
+            // Append new image to existing images
             const currentImages = updateProductDto.images || [];
             if (Array.isArray(currentImages)) {
-                currentImages.push(result.secure_url);
+                currentImages.push(result.url);
             } else {
-                // if it's a string (from form-data messing up array), make it array
-                updateProductDto.images = [currentImages, result.secure_url];
+                updateProductDto.images = [currentImages, result.url];
             }
-            // Actually, type transformation in DTO handles string -> array. 
-            // So we can assume it's array or undefined.
             if (!updateProductDto.images) {
                 updateProductDto.images = [];
             }
-            updateProductDto.images.push(result.secure_url);
+            updateProductDto.images.push(result.url);
         }
 
         return this.productsService.update(id, updateProductDto);

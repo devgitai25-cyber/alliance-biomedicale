@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { json, urlencoded } from 'express';
+import * as express from 'express';
+import { join } from 'path';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import helmet from 'helmet';
@@ -12,7 +14,9 @@ async function bootstrap() {
   });
 
   // Security: helmet middleware for security headers
-  app.use(helmet());
+  app.use(helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  }));
 
   // Increase body limit for large base64 images
   app.use(json({ limit: '50mb' }));
@@ -56,11 +60,15 @@ async function bootstrap() {
     }),
   );
 
+  // Serve uploaded files as static assets (before global prefix)
+  const uploadsDir = process.env.UPLOAD_DIR || join(process.cwd(), 'uploads');
+  app.use('/uploads', express.static(uploadsDir));
+
   // Global prefix
   app.setGlobalPrefix('api');
 
   const port = process.env.APP_PORT || 3001;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 
   console.log(`🚀 Server running on http://localhost:${port}/api`);
   console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);

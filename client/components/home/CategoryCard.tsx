@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { resolveImageUrl } from '@/lib/image';
 
 interface CategoryCardProps {
     id: string;
@@ -24,11 +25,12 @@ export function CategoryCard({ id, name, image, index }: CategoryCardProps) {
             <div className="relative aspect-[3/4] md:aspect-[4/5] bg-gray-100 overflow-hidden">
                 {image ? (
                     <Image
-                        src={image}
+                        src={resolveImageUrl(image)}
                         alt={name}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                         sizes="(max-width: 768px) 50vw, 25vw"
+                        unoptimized
                     />
                 ) : (
                     <div className="absolute inset-0 flex items-center justify-center bg-gray-50 text-6xl text-teal-light/20">

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { validatePromoCode } from '@/lib/api';
 import { useSettings } from '@/hooks/useSettings';
+import { resolveImageUrl } from '@/lib/image';
 
 
 export function OrderSummary() {
@@ -44,11 +45,11 @@ export function OrderSummary() {
                     <div key={item.id} className="flex gap-4 items-start group">
                         <div className="relative w-20 h-20 bg-gray-ultra-light rounded-lg overflow-hidden border border-gray-light shadow-sm group-hover:shadow-md transition-shadow duration-300">
                             <Image
-                                src={item.product.images?.[0] || '/placeholder.png'}
+                                src={resolveImageUrl(item.product.images?.[0])}
                                 alt={item.product.name}
                                 fill
                                 className="object-cover transition-transform duration-500 group-hover:scale-105"
-                                unoptimized={item.product.images?.[0]?.startsWith('http') || false}
+                                unoptimized
                             />
                             <span className="absolute -top-1 -right-1 bg-dark text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-white shadow-sm">
                                 {item.quantity}

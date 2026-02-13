@@ -19,19 +19,19 @@ const products_service_1 = require("./products.service");
 const product_dto_1 = require("./dto/product.dto");
 const auth_guard_1 = require("../auth/guards/auth.guard");
 const auth_guard_2 = require("../auth/guards/auth.guard");
-const cloudinary_service_1 = require("../cloudinary/cloudinary.service");
+const upload_service_1 = require("../upload/upload.service");
 let ProductsController = class ProductsController {
     productsService;
-    cloudinaryService;
-    constructor(productsService, cloudinaryService) {
+    uploadService;
+    constructor(productsService, uploadService) {
         this.productsService = productsService;
-        this.cloudinaryService = cloudinaryService;
+        this.uploadService = uploadService;
     }
     async create(createProductDto, file) {
         let imageUrl = '';
         if (file) {
-            const result = await this.cloudinaryService.uploadImage(file);
-            imageUrl = result.secure_url;
+            const result = await this.uploadService.uploadImage(file);
+            imageUrl = result.url;
         }
         const images = createProductDto.images || [];
         if (imageUrl) {
@@ -57,18 +57,18 @@ let ProductsController = class ProductsController {
     }
     async update(id, updateProductDto, file) {
         if (file) {
-            const result = await this.cloudinaryService.uploadImage(file);
+            const result = await this.uploadService.uploadImage(file);
             const currentImages = updateProductDto.images || [];
             if (Array.isArray(currentImages)) {
-                currentImages.push(result.secure_url);
+                currentImages.push(result.url);
             }
             else {
-                updateProductDto.images = [currentImages, result.secure_url];
+                updateProductDto.images = [currentImages, result.url];
             }
             if (!updateProductDto.images) {
                 updateProductDto.images = [];
             }
-            updateProductDto.images.push(result.secure_url);
+            updateProductDto.images.push(result.url);
         }
         return this.productsService.update(id, updateProductDto);
     }
@@ -137,6 +137,6 @@ __decorate([
 exports.ProductsController = ProductsController = __decorate([
     (0, common_1.Controller)('products'),
     __metadata("design:paramtypes", [products_service_1.ProductsService,
-        cloudinary_service_1.CloudinaryService])
+        upload_service_1.UploadService])
 ], ProductsController);
 //# sourceMappingURL=products.controller.js.map

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { resolveImageUrl } from '@/lib/image';
 
 interface ProductGalleryProps {
     images: string[];
@@ -29,11 +30,11 @@ export function ProductGallery({ images, productName, comparePrice }: ProductGal
                     {images.map((img, i) => (
                         <div key={i} className="flex-none w-[85vw] aspect-square relative snap-center rounded-2xl overflow-hidden shadow-sm border border-gray-100">
                             <Image
-                                src={img}
+                                src={resolveImageUrl(img)}
                                 alt={`${productName} - Vue ${i + 1}`}
                                 fill
                                 className="object-cover"
-                                unoptimized={img?.startsWith('http')}
+                                unoptimized
                                 priority={i === 0}
                             />
                             {i === 0 && comparePrice && (
@@ -60,11 +61,11 @@ export function ProductGallery({ images, productName, comparePrice }: ProductGal
                 {/* Main Image */}
                 <div className="relative aspect-square bg-gray-ultra-light rounded-2xl overflow-hidden shadow-soft group border border-gray-light/30">
                     <Image
-                        src={images[selectedImage]}
+                        src={resolveImageUrl(images[selectedImage])}
                         alt={`${productName}`}
                         fill
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
-                        unoptimized={images[selectedImage]?.startsWith('http')}
+                        unoptimized
                         priority
                     />
                     {comparePrice && (
@@ -111,11 +112,11 @@ export function ProductGallery({ images, productName, comparePrice }: ProductGal
                                     }`}
                             >
                                 <Image
-                                    src={img}
+                                    src={resolveImageUrl(img)}
                                     alt={`${productName} view ${i + 1}`}
                                     fill
                                     className="object-cover"
-                                    unoptimized={img?.startsWith('http')}
+                                    unoptimized
                                 />
                             </button>
                         ))}

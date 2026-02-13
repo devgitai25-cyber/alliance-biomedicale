@@ -4,6 +4,7 @@ import { useCart } from '@/context/CartContext';
 import { Button } from '@/components/ui/Button';
 import Image from 'next/image';
 import Link from 'next/link';
+import { resolveImageUrl } from '@/lib/image';
 
 export function CartDrawer() {
     const {
@@ -56,11 +57,11 @@ export function CartDrawer() {
                                 {/* Image */}
                                 <div className="relative w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                                     <Image
-                                        src={item.product.images?.[0] || '/placeholder.png'}
+                                        src={resolveImageUrl(item.product.images?.[0])}
                                         alt={item.product.name}
                                         fill
                                         className="object-cover"
-                                        unoptimized={item.product.images?.[0]?.startsWith('http') || false}
+                                        unoptimized
                                     />
                                 </div>
 
