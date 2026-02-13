@@ -13,10 +13,8 @@ COPY . .
 # Generate Prisma Client
 RUN npx prisma generate
 
-# Build NestJS using tsc (SWC may not work on Alpine/musl)
-RUN npx tsc -p tsconfig.build.json
-# Verify build output exists
-RUN ls dist/main.js
+# Build NestJS (nest-cli.json forces tsc builder, no SWC issues on Alpine)
+RUN npm run build
 
 # ---- Stage 3: Production Runner ----
 FROM node:20-alpine AS runner
