@@ -1,137 +1,113 @@
-# 🚀 Deployment Guide — alliance-biomedicale.com
+# 🚀 Dokploy Deployment Guide — alliance-biomedicale.com
 
-Deploy on Ubuntu 24.04 VPS (Hostinger) with Docker Compose.
+Deploy as 3 independent applications on Dokploy.
 
-## Prerequisites
+---
 
-SSH into your VPS and install Docker:
+## Architecture
 
+```
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│   Frontend   │────▶│   Backend    │────▶│  PostgreSQL   │
+│  (Next.js)   │     │  (NestJS)    │     │   Database    │
+│  Port 3000   │     │  Port 3001   │     │  Port 5432    │
+└──────────────┘     └──────────────┘     └──────────────┘
+```
+
+Dokploy handles: routing, SSL (Let's Encrypt), and internal networking.
+
+---
+
+## Step 1: Create PostgreSQL Database
+
+In Dokploy dashboard:
+1. **Create → Database → PostgreSQL**
+2. Image: `postgres:16-alpine`
+3. Set environment variables:
+   - `POSTGRES_USER` = `bioeco`
+   - `POSTGRES_PASSWORD` = `<strong-random-password>`
+   - `POSTGRES_DB` = `bioeco`
+4. Enable **persistent storage**
+5. Note the **internal hostname** (e.g., `postgres-xxxx`)
+
+---
+
+## Step 2: Deploy Backend (NestJS)
+
+1. **Create → Application**
+2. Source: **Git** → your repository URL
+3. Build Type: **Dockerfile**
+4. **Build Path (context)**: `./server`
+5. **Dockerfile Path**: `./server/Dockerfile`
+6. Set environment variables:
+
+| Variable | Value |
+|---|---|
+| `DATABASE_URL` | `postgresql://bioeco:<password>@<postgres-hostname>:5432/bioeco?schema=public` |
+| `JWT_SECRET` | `<random-64-char-string>` |
+| `JWT_EXPIRES_IN` | `7d` |
+| `APP_PORT` | `3001` |
+| `NODE_ENV` | `production` |
+| `CORS_ORIGINS` | `https://alliance-biomedicale.com` |
+| `FRONTEND_URL` | `https://alliance-biomedicale.com` |
+| `GOOGLE_CLIENT_ID` | `<from-google-console>` |
+| `GOOGLE_CLIENT_SECRET` | `<from-google-console>` |
+| `GOOGLE_CALLBACK_URL` | `https://alliance-biomedicale.com/api/auth/google/callback` |
+
+7. Set port to **3001**
+8. Assign domain (e.g., `api.alliance-biomedicale.com` or use Dokploy's internal routing)
+9. Deploy
+
+---
+
+## Step 3: Deploy Frontend (Next.js)
+
+1. **Create → Application**
+2. Source: **Git** → your repository URL
+3. Build Type: **Dockerfile**
+4. **Build Path (context)**: `./client`
+5. **Dockerfile Path**: `./client/Dockerfile`
+6. Set **build argument**:
+
+| Build Arg | Value |
+|---|---|
+| `NEXT_PUBLIC_API_URL` | `https://api.alliance-biomedicale.com/api` (or wherever backend is deployed) |
+
+7. Set port to **3000**
+8. Assign domain: `alliance-biomedicale.com`
+9. Enable SSL (Let's Encrypt) — Dokploy handles this automatically
+10. Deploy
+
+---
+
+## Step 4: Seed Database (First Time)
+
+In the backend application terminal (Dokploy console):
 ```bash
-# Update system
-sudo apt update && sudo apt upgrade -y
-
-# Install Docker
-curl -fsSL https://get.docker.com | sudo sh
-sudo usermod -aG docker $USER
-
-# Install Docker Compose (included with modern Docker)
-docker compose version
+npx prisma db seed
 ```
 
-Log out and back in for group changes to take effect.
+---
 
-## 1. Clone & Configure
+## Step 5: Google OAuth Setup
 
-```bash
-# Clone your repo
-git clone https://github.com/YOUR_USERNAME/bioeco.git
-cd bioeco
+In Google Cloud Console → APIs & Services → Credentials:
+- **Authorized redirect URI**: `https://alliance-biomedicale.com/api/auth/google/callback`
+- **Authorized JavaScript origin**: `https://alliance-biomedicale.com`
 
-# Create production env file
-cp .env.production.example .env
-nano .env
-```
+---
 
-Fill in `.env` with real values:
+## Verify
 
-```env
-POSTGRES_USER=bioeco
-POSTGRES_PASSWORD=<strong-random-password>
-POSTGRES_DB=bioeco
-JWT_SECRET=<random-64-char-string>
-JWT_EXPIRES_IN=7d
-GOOGLE_CLIENT_ID=<your-google-client-id>
-GOOGLE_CLIENT_SECRET=<your-google-client-secret>
-```
+- `https://alliance-biomedicale.com` → Frontend loads
+- `https://api.alliance-biomedicale.com/api/settings/public` → API responds
+- Google login works
+- Product image upload works (saved to local `/app/uploads/`)
 
-> **Important**: Update Google Cloud Console → OAuth → Authorized redirect URIs to:
-> `https://alliance-biomedicale.com/api/auth/google/callback`
+---
 
-## 2. SSL Certificate (First Time)
+## Updates
 
-Before starting with SSL, create a temporary Nginx config for the Certbot challenge:
-
-```bash
-# Create temp nginx config (HTTP only, for initial cert)
-cat > nginx/default.conf.tmp << 'EOF'
-server {
-    listen 80;
-    server_name alliance-biomedicale.com www.alliance-biomedicale.com;
-    location /.well-known/acme-challenge/ { root /var/www/certbot; }
-    location / { return 200 'OK'; }
-}
-EOF
-
-# Temporarily use this config
-cp nginx/default.conf nginx/default.conf.bak
-cp nginx/default.conf.tmp nginx/default.conf
-
-# Start just nginx
-docker compose up -d nginx
-
-# Get SSL certificate
-docker compose run --rm certbot certonly \
-  --webroot --webroot-path=/var/www/certbot \
-  -d alliance-biomedicale.com -d www.alliance-biomedicale.com \
-  --email your-email@example.com --agree-tos --no-eff-email
-
-# Restore full config
-cp nginx/default.conf.bak nginx/default.conf
-
-# Stop nginx
-docker compose down
-```
-
-## 3. Build & Start
-
-```bash
-# Build all images (first time takes ~5 min)
-docker compose build
-
-# Start all services
-docker compose up -d
-
-# Check status
-docker compose ps
-
-# View logs
-docker compose logs -f
-```
-
-## 4. Seed Database (First Time)
-
-```bash
-# Run Prisma migrations + seed
-docker compose exec server npx prisma db seed
-```
-
-## 5. Verify
-
-- Open `https://alliance-biomedicale.com` — frontend should load
-- Open `https://alliance-biomedicale.com/api/settings/public` — API should respond
-- Try Google login
-- Upload a product image (admin panel) — should save to local storage
-
-## Common Commands
-
-```bash
-# Restart after code changes
-docker compose down
-git pull
-docker compose build
-docker compose up -d
-
-# View logs
-docker compose logs -f server
-docker compose logs -f client
-
-# Database backup
-docker compose exec db pg_dump -U bioeco bioeco > backup_$(date +%F).sql
-
-# Restore database
-cat backup.sql | docker compose exec -T db psql -U bioeco bioeco
-
-# Renew SSL (auto via certbot container, or manually)
-docker compose run --rm certbot renew
-docker compose exec nginx nginx -s reload
-```
+To redeploy after code changes:
+1. `git push` to your repository
+2. In Dokploy, click **Redeploy** on the affected application(s)
