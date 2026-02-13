@@ -180,6 +180,12 @@ export async function Footer() {
                             </svg>
                             Made in Tunisia
                         </span>
+                        <span className="flex items-center gap-1.5">
+                            <svg className="w-3.5 h-3.5 text-teal-main" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                            </svg>
+                            Developed by <a href="#" className="hover:text-teal-main transition-colors">HK</a>
+                        </span>
                     </div>
                 </div>
             </div>
