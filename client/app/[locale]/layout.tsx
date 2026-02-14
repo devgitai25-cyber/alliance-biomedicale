@@ -9,10 +9,11 @@ import { Footer } from '@/components/Footer';
 import { TopLoader } from '@/components/TopLoader';
 
 export const metadata: Metadata = {
-    title: 'Alliance Biomédicale - Cosmétiques & Soins Bio',
-    description: 'Découvrez notre gamme de produits cosmétiques et de soins biologiques de haute qualité',
+    title: 'Alliance Biomédicale - Cosmétiques & Soins Bio - Produits Naturels & Écologiques',
+    description: 'Découvrez notre gamme de produits cosmétiques et de soins biologiques de haute qualité. Fabriqué en Tunisie.',
     icons: {
         icon: '/logo.png',
+        shortcut: '/logo.png',
         apple: '/logo.png',
     },
 };
