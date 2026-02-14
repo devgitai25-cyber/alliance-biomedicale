@@ -21,15 +21,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
                             <Link href="/" className="text-3xl font-serif font-bold text-dark tracking-wide uppercase hover:text-primary transition-colors">
                                 Alliance Biomédicale
                             </Link>
-                            <div className="flex items-center space-x-2 text-xs font-medium tracking-widest text-gray-medium uppercase">
-                                <span>Panier</span>
-                                <span className="text-gray-light">/</span>
-                                <span className="text-dark border-b border-dark pb-0.5">Information</span>
-                                <span className="text-gray-light">/</span>
-                                <span>Livraison</span>
-                                <span className="text-gray-light">/</span>
-                                <span>Paiement</span>
-                            </div>
+
                         </div>
                     </Container>
                 </header>
