@@ -97,10 +97,13 @@ export async function getFeaturedProducts(): Promise<Product[]> {
 }
 
 export async function createOrder(orderData: import('@/types').Order): Promise<any> {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
     const res = await fetch(`${API_URL}/orders`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         },
         body: JSON.stringify(orderData),
     });
