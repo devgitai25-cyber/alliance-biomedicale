@@ -61,25 +61,26 @@ export class OrdersService {
                 let user;
 
                 if (userId) {
+                    // Authenticated user: always link the order to their account
                     user = await tx.user.findUnique({ where: { id: userId } });
                 }
 
                 if (!user) {
+                    // Guest checkout: find by email or create a new guest user
                     user = await tx.user.findUnique({ where: { email } });
-                }
 
-                if (!user) {
-                    this.logger.log(`Creating new user for ${email}`);
-                    // Create checkout user (password placeholder for guest checkout)
-                    user = await tx.user.create({
-                        data: {
-                            email,
-                            firstName,
-                            lastName,
-                            phone,
-                            password: '$2a$10$GuestUserPasswordPlaceholderHash...',
-                        },
-                    });
+                    if (!user) {
+                        this.logger.log(`Creating new user for ${email}`);
+                        user = await tx.user.create({
+                            data: {
+                                email,
+                                firstName,
+                                lastName,
+                                phone,
+                                password: '$2a$10$GuestUserPasswordPlaceholderHash...',
+                            },
+                        });
+                    }
                 }
 
                 // 4. Calculate subtotal from actual product prices (security: don't trust client)
