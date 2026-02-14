@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/Button';
 import { Category } from '@/types';
+import { resolveImageUrl, shouldSkipOptimization } from '@/lib/image';
 
 interface CategoryTableProps {
     categories: Category[];
@@ -74,11 +75,11 @@ export function CategoryTable({ categories, onDelete }: CategoryTableProps) {
                                             <div className="relative w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border">
                                                 {category.image ? (
                                                     <Image
-                                                        src={category.image}
+                                                        src={resolveImageUrl(category.image)}
                                                         alt={category.name}
                                                         fill
                                                         className="object-cover"
-                                                        unoptimized={category.image.startsWith('http')}
+                                                        unoptimized={shouldSkipOptimization(category.image)}
                                                     />
                                                 ) : (
                                                     <div className="w-full h-full flex items-center justify-center text-xl bg-gray-50">

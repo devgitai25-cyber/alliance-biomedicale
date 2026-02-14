@@ -39,9 +39,14 @@ export function isExternalImage(src: string | undefined): boolean {
 
 /**
  * Check if the image should skip Next.js optimization.
- * Base64 data URLs can't go through the Next.js image optimizer.
+ * - Base64 data URLs can't go through the Next.js image optimizer.
+ * - Local upload paths resolve to external API URLs which the optimizer may fail to proxy.
  */
 export function shouldSkipOptimization(src: string | undefined): boolean {
     if (!src) return false;
-    return src.startsWith('data:');
+    // Data URLs can't be optimized
+    if (src.startsWith('data:')) return true;
+    // Upload paths resolve to external API — skip optimizer to load directly
+    if (src.startsWith('/uploads/')) return true;
+    return false;
 }
