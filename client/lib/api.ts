@@ -254,6 +254,13 @@ export async function getCategories(): Promise<import('@/types').Category[]> {
     return data.map((c: any) => mapCategory(c));
 }
 
+export async function getAdminCategories(): Promise<import('@/types').Category[]> {
+    const res = await fetch(`${API_URL}/categories`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch categories');
+    const data = await res.json();
+    return data.map((c: any) => mapCategory(c));
+}
+
 export async function getCategory(id: string): Promise<any> {
     const res = await fetch(`${API_URL}/categories/${id}`, { next: { revalidate: 300 } });
     if (!res.ok) throw new Error('Failed to fetch category');

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { getCategories, deleteCategory } from '@/lib/api';
+import { getAdminCategories, deleteCategory } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
 import { CategoryTable } from '@/components/admin/CategoryTable';
 import { Category } from '@/types';
@@ -18,7 +18,7 @@ export default function CategoriesPage() {
 
     const loadCategories = async () => {
         try {
-            const data = await getCategories();
+            const data = await getAdminCategories();
             setCategories(data);
         } catch (error) {
             console.error('Failed to load categories:', error);
