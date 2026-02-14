@@ -78,18 +78,20 @@ export class CategoriesService {
         });
     }
 
-    async remove(id: string) {
+    async remove(id: string, cascade: boolean = false) {
         const category = await this.findOne(id);
 
-        // Check if category has products
-        const productCount = await this.prisma.product.count({
-            where: { categoryId: id },
-        });
+        if (!cascade) {
+            // Check if category has products
+            const productCount = await this.prisma.product.count({
+                where: { categoryId: id },
+            });
 
-        if (productCount > 0) {
-            throw new ConflictException(
-                `Cannot delete category with ${productCount} product(s). Please reassign or delete products first.`,
-            );
+            if (productCount > 0) {
+                throw new ConflictException(
+                    `Cannot delete category with ${productCount} product(s). Please reassign or delete products first.`,
+                );
+            }
         }
 
         await this.prisma.category.delete({

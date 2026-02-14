@@ -28,9 +28,9 @@ export default function CategoriesPage() {
         }
     };
 
-    const handleDelete = async (id: string) => {
+    const handleDelete = async (id: string, cascade: boolean) => {
         try {
-            await deleteCategory(id);
+            await deleteCategory(id, cascade);
             // @ts-ignore - id mismatch potentially in filtered list
             setCategories(categories.filter(cat => cat.id !== id));
         } catch (error: any) {

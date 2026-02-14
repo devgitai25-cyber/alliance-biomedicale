@@ -9,7 +9,7 @@ import { resolveImageUrl, shouldSkipOptimization } from '@/lib/image';
 
 interface CategoryTableProps {
     categories: Category[];
-    onDelete: (id: string) => void;
+    onDelete: (id: string, cascade: boolean) => void;
 }
 
 export function CategoryTable({ categories, onDelete }: CategoryTableProps) {
@@ -112,22 +112,30 @@ export function CategoryTable({ categories, onDelete }: CategoryTableProps) {
                                                 Modifier
                                             </Link>
                                             {deleteConfirm === category.id ? (
-                                                <div className="flex items-center gap-2">
-                                                    <button
-                                                        onClick={() => {
-                                                            onDelete(category.id);
-                                                            setDeleteConfirm(null);
-                                                        }}
-                                                        className="text-red-600 hover:text-red-800"
-                                                    >
-                                                        Confirmer
-                                                    </button>
-                                                    <button
-                                                        onClick={() => setDeleteConfirm(null)}
-                                                        className="text-gray-500 hover:text-gray-700"
-                                                    >
-                                                        Annuler
-                                                    </button>
+                                                <div className="flex flex-col items-end gap-2">
+                                                    {(category._count?.products ?? 0) > 0 && (
+                                                        <span className="text-xs text-red-600 font-medium">
+                                                            ⚠️ Contient {category._count?.products} produits
+                                                        </span>
+                                                    )}
+                                                    <div className="flex items-center gap-2">
+                                                        <button
+                                                            onClick={() => {
+                                                                const hasProducts = (category._count?.products ?? 0) > 0;
+                                                                onDelete(category.id, hasProducts);
+                                                                setDeleteConfirm(null);
+                                                            }}
+                                                            className="text-red-600 hover:text-red-800"
+                                                        >
+                                                            {(category._count?.products ?? 0) > 0 ? "Tout supprimer" : "Confirmer"}
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setDeleteConfirm(null)}
+                                                            className="text-gray-500 hover:text-gray-700"
+                                                        >
+                                                            Annuler
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             ) : (
                                                 <button

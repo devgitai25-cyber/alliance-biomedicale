@@ -296,9 +296,11 @@ export async function updateCategory(id: string, data: FormData | any): Promise<
     return res.json();
 }
 
-export async function deleteCategory(id: string): Promise<void> {
+export async function deleteCategory(id: string, cascade: boolean = false): Promise<void> {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    const res = await fetch(`${API_URL}/categories/${id}`, {
+    const url = `${API_URL}/categories/${id}${cascade ? '?cascade=true' : ''}`;
+
+    const res = await fetch(url, {
         method: 'DELETE',
         headers: {
             'Authorization': `Bearer ${token}`,

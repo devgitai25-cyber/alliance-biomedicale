@@ -9,6 +9,8 @@ import {
     UseGuards,
     UseInterceptors,
     UploadedFile,
+    Query,
+    ParseBoolPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CategoriesService } from './categories.service';
@@ -65,8 +67,11 @@ export class CategoriesController {
 
     @Delete(':id')
     @UseGuards(JwtAuthGuard, AdminGuard)
-    remove(@Param('id') id: string) {
-        return this.categoriesService.remove(id);
+    remove(
+        @Param('id') id: string,
+        @Query('cascade', new ParseBoolPipe({ optional: true })) cascade?: boolean,
+    ) {
+        return this.categoriesService.remove(id, cascade);
     }
 
     @Patch('reorder/bulk')
