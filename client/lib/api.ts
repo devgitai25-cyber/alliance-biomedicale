@@ -260,15 +260,16 @@ export async function getCategory(id: string): Promise<any> {
     return res.json();
 }
 
-export async function createCategory(data: any): Promise<any> {
+export async function createCategory(data: FormData | any): Promise<any> {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const isFormData = data instanceof FormData;
     const res = await fetch(`${API_URL}/categories`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
             'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(data),
+        body: isFormData ? data : JSON.stringify(data),
     });
     if (!res.ok) {
         const error = await res.json();
@@ -277,15 +278,16 @@ export async function createCategory(data: any): Promise<any> {
     return res.json();
 }
 
-export async function updateCategory(id: string, data: any): Promise<any> {
+export async function updateCategory(id: string, data: FormData | any): Promise<any> {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const isFormData = data instanceof FormData;
     const res = await fetch(`${API_URL}/categories/${id}`, {
         method: 'PATCH',
         headers: {
-            'Content-Type': 'application/json',
+            ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
             'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(data),
+        body: isFormData ? data : JSON.stringify(data),
     });
     if (!res.ok) {
         const error = await res.json();

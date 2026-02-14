@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
+import { resolveImageUrl } from '@/lib/image';
 
 interface CategoryFormProps {
     initialData?: any;
@@ -14,7 +15,9 @@ export function CategoryForm({ initialData, isEdit = false }: CategoryFormProps)
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [imageFile, setImageFile] = useState<File | null>(null);
-    const [imagePreview, setImagePreview] = useState<string | null>(initialData?.image || null);
+    const [imagePreview, setImagePreview] = useState<string | null>(
+        initialData?.image ? resolveImageUrl(initialData.image) : null
+    );
 
     const [formData, setFormData] = useState({
         slug: initialData?.slug || '',
@@ -46,11 +49,8 @@ export function CategoryForm({ initialData, isEdit = false }: CategoryFormProps)
         const file = e.target.files?.[0];
         if (file) {
             setImageFile(file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result as string);
-            };
-            reader.readAsDataURL(file);
+            // Create local preview using object URL (no base64!)
+            setImagePreview(URL.createObjectURL(file));
         }
     };
 
@@ -60,27 +60,15 @@ export function CategoryForm({ initialData, isEdit = false }: CategoryFormProps)
         setError('');
 
         try {
-            // For now, we'll store image as base64 if uploaded
-            // In production, you'd want to upload to Cloudinary via backend
-            let imageUrl = initialData?.image || '';
+            const data = new FormData();
+            data.append('slug', formData.slug);
+            data.append('name', formData.name);
+            data.append('description', formData.description);
+            data.append('displayOrder', String(formData.displayOrder));
 
             if (imageFile) {
-                // Convert to base64 for simple storage
-                // TODO: Implement proper image upload via backend
-                const reader = new FileReader();
-                imageUrl = await new Promise<string>((resolve) => {
-                    reader.onloadend = () => resolve(reader.result as string);
-                    reader.readAsDataURL(imageFile);
-                });
+                data.append('image', imageFile);
             }
-
-            const data = {
-                slug: formData.slug,
-                name: formData.name,
-                description: formData.description,
-                displayOrder: formData.displayOrder,
-                image: imageUrl || undefined,
-            };
 
             const { createCategory, updateCategory } = await import('@/lib/api');
 
@@ -168,12 +156,22 @@ export function CategoryForm({ initialData, isEdit = false }: CategoryFormProps)
                     className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
                 {imagePreview && (
-                    <div className="mt-4">
+                    <div className="mt-4 relative">
                         <img
                             src={imagePreview}
                             alt="Preview"
                             className="w-32 h-32 object-cover rounded-lg"
                         />
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setImagePreview(null);
+                                setImageFile(null);
+                            }}
+                            className="absolute top-1 left-24 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-md hover:bg-red-600"
+                        >
+                            ✕
+                        </button>
                     </div>
                 )}
             </div>
