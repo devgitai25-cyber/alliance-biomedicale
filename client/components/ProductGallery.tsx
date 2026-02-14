@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { resolveImageUrl } from '@/lib/image';
+import { resolveImageUrl, shouldSkipOptimization } from '@/lib/image';
 
 interface ProductGalleryProps {
     images: string[];
@@ -36,6 +36,7 @@ export function ProductGallery({ images, productName, comparePrice }: ProductGal
                                 className="object-cover"
                                 sizes="85vw"
                                 priority={i === 0}
+                                unoptimized={shouldSkipOptimization(img)}
                             />
                             {i === 0 && comparePrice && (
                                 <div className="absolute top-4 left-4 bg-error text-white px-3 py-1 rounded-full text-xs font-bold shadow-md z-10 uppercase tracking-wide">
@@ -67,6 +68,7 @@ export function ProductGallery({ images, productName, comparePrice }: ProductGal
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
                         sizes="50vw"
                         priority
+                        unoptimized={shouldSkipOptimization(images[selectedImage])}
                     />
                     {comparePrice && (
                         <div className="absolute top-6 left-6 bg-error text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-lg z-10 uppercase tracking-widest">
@@ -117,6 +119,7 @@ export function ProductGallery({ images, productName, comparePrice }: ProductGal
                                     fill
                                     className="object-cover"
                                     sizes="10vw"
+                                    unoptimized={shouldSkipOptimization(img)}
                                 />
                             </button>
                         ))}

@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
-import { resolveImageUrl } from '@/lib/image';
+import { resolveImageUrl, shouldSkipOptimization } from '@/lib/image';
 
 export default function CartPage() {
     const { items: cart, updateQuantity, removeItem: removeFromCart, subtotal: total } = useCart();
@@ -85,6 +85,7 @@ export default function CartPage() {
                                             fill
                                             className="object-cover"
                                             sizes="96px"
+                                            unoptimized={shouldSkipOptimization(item.product.images[0])}
                                         />
                                     ) : (
                                         <div className="flex items-center justify-center h-full text-4xl text-teal-light/30">

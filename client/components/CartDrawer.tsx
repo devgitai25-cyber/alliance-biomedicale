@@ -4,7 +4,7 @@ import { useCart } from '@/context/CartContext';
 import { Button } from '@/components/ui/Button';
 import Image from 'next/image';
 import Link from 'next/link';
-import { resolveImageUrl } from '@/lib/image';
+import { resolveImageUrl, shouldSkipOptimization } from '@/lib/image';
 
 export function CartDrawer() {
     const {
@@ -62,6 +62,7 @@ export function CartDrawer() {
                                         fill
                                         className="object-cover"
                                         sizes="80px"
+                                        unoptimized={shouldSkipOptimization(item.product.images?.[0])}
                                     />
                                 </div>
 

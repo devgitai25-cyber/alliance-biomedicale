@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { resolveImageUrl } from '@/lib/image';
+import { resolveImageUrl, shouldSkipOptimization } from '@/lib/image';
 
 interface ProductCardProps {
     id: string;
@@ -44,6 +44,7 @@ export function ProductCard({
                         fill
                         className="object-cover group-hover:scale-103 transition-transform duration-500 ease-out"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        unoptimized={shouldSkipOptimization(image)}
                     />
                 ) : (
                     <div className="absolute inset-0 flex items-center justify-center text-5xl text-gray-light/50">
