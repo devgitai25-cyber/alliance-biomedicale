@@ -12,7 +12,11 @@ export class CategoriesService {
             orderBy: { displayOrder: 'asc' },
             include: {
                 _count: {
-                    select: { products: true },
+                    select: {
+                        products: {
+                            where: { active: true },
+                        },
+                    },
                 },
             },
         });
@@ -23,7 +27,11 @@ export class CategoriesService {
             where: { id },
             include: {
                 _count: {
-                    select: { products: true },
+                    select: {
+                        products: {
+                            where: { active: true },
+                        },
+                    },
                 },
             },
         });
