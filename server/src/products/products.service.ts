@@ -14,8 +14,10 @@ export class ProductsService {
                 .toLowerCase()
                 .replace(/[^a-z0-9]+/g, '-')
                 .replace(/(^-|-$)+/g, '');
-            // Simple uniqueness check could be added here
         }
+
+        // Ensure slug uniqueness
+        slug = await this.generateUniqueSlug(slug);
 
         const product = await this.prisma.product.create({
             data: {
@@ -28,6 +30,24 @@ export class ProductsService {
         });
 
         return product;
+    }
+
+    private async generateUniqueSlug(baseSlug: string): Promise<string> {
+        let slug = baseSlug;
+        let counter = 1;
+
+        while (true) {
+            const existingProduct = await this.prisma.product.findUnique({
+                where: { slug },
+            });
+
+            if (!existingProduct) {
+                return slug;
+            }
+
+            slug = `${baseSlug}-${counter}`;
+            counter++;
+        }
     }
 
     async findAllCategories() {
