@@ -11,6 +11,10 @@ import { TopLoader } from '@/components/TopLoader';
 export const metadata: Metadata = {
     title: 'Alliance Biomédicale - Cosmétiques & Soins Bio',
     description: 'Découvrez notre gamme de produits cosmétiques et de soins biologiques de haute qualité',
+    icons: {
+        icon: '/logo.png',
+        apple: '/logo.png',
+    },
 };
 
 
