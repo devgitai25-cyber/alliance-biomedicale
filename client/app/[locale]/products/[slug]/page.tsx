@@ -67,16 +67,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                                 {product.name}
                             </h1>
 
-                            {/* Rating - Refined */}
-                            <div className="flex items-center gap-4 mb-6">
-                                <div className="flex text-teal-main text-lg">
-                                    {'⭐'.repeat(Math.round(product.rating || 5))}
-                                    {'☆'.repeat(5 - Math.round(product.rating || 5))}
-                                </div>
-                                <span className="text-gray-medium font-body text-sm">
-                                    {product.rating?.toFixed(1) || '5.0'} ({product.reviewCount || 0} avis)
-                                </span>
-                            </div>
+
 
                             {/* Price - Elegant */}
                             <div className="flex items-baseline gap-4 mb-8">

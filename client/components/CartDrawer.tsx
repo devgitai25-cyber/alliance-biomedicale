@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { Button } from '@/components/ui/Button';
 import Image from 'next/image';
@@ -16,6 +18,12 @@ export function CartDrawer() {
         subtotal,
         totalItems
     } = useCart();
+
+    // Auto-close cart when route changes
+    const pathname = usePathname();
+    useEffect(() => {
+        closeCart();
+    }, [pathname]);
 
     if (!isCartOpen) return null;
 
@@ -125,7 +133,7 @@ export function CartDrawer() {
                             </div>
                             <p className="text-xs text-gray-500 text-center">Frais de livraison calculés à l'étape suivante</p>
                         </div>
-                        <Button className="w-full text-lg py-4" href="/checkout">
+                        <Button className="w-full text-lg py-4" href="/checkout" onClick={closeCart}>
                             Passer la commande
                         </Button>
                         <Button variant="ghost" className="w-full text-sm" onClick={closeCart}>
