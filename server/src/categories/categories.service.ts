@@ -92,6 +92,23 @@ export class CategoriesService {
                     `Cannot delete category with ${productCount} product(s). Please reassign or delete products first.`,
                 );
             }
+        } else {
+            // Check if any products in this category have associated orders
+            // We cannot delete products that have been ordered (integrity)
+            const productsWithOrders = await this.prisma.product.count({
+                where: {
+                    categoryId: id,
+                    orderItems: {
+                        some: {},
+                    },
+                },
+            });
+
+            if (productsWithOrders > 0) {
+                throw new ConflictException(
+                    `Cannot delete category. ${productsWithOrders} product(s) have existing orders and cannot be removed.`,
+                );
+            }
         }
 
         await this.prisma.category.delete({
