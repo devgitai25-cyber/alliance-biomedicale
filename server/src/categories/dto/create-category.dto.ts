@@ -1,4 +1,5 @@
 import { IsString, IsNotEmpty, IsOptional, Matches, MinLength, MaxLength, IsInt, Min } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateCategoryDto {
     @IsString()
@@ -24,7 +25,9 @@ export class CreateCategoryDto {
     image?: string;
 
     @IsOptional()
+    @Type(() => Number)
     @IsInt()
     @Min(0)
     displayOrder?: number;
 }
+
