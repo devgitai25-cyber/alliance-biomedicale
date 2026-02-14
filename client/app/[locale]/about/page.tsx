@@ -36,11 +36,15 @@ export default async function AboutPage({ params }: AboutPageProps) {
                             Nous sélectionnons rigoureusement nos partenaires et nos ingrédients pour garantir efficacité, sécurité et transparence.
                         </p>
                     </div>
-                    <div className="relative h-[400px] rounded-luxury overflow-hidden border border-gray-light/50 shadow-soft bg-gray-ultra-light">
-                        {/* Placeholder for About Image */}
-                        <div className="absolute inset-0 flex items-center justify-center text-7xl text-teal-light/30">
-                            🌿
-                        </div>
+                    <div className="relative h-[400px] rounded-luxury overflow-hidden border border-gray-light/50 shadow-soft bg-white p-8">
+                        <Image
+                            src="/logo.png"
+                            alt="Alliance Biomédicale - Notre Mission"
+                            fill
+                            className="object-contain"
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                            priority
+                        />
                     </div>
                 </section>
 
