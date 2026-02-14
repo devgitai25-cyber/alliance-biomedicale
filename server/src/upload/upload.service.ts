@@ -1,11 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import * as sharp from 'sharp';
 
 @Injectable()
 export class UploadService {
     private readonly uploadDir: string;
+    private readonly logger = new Logger(UploadService.name);
+
+    // Max dimensions for uploaded images
+    private readonly MAX_WIDTH = 1200;
+    private readonly MAX_HEIGHT = 1200;
+    private readonly QUALITY = 80;
 
     constructor() {
         this.uploadDir = process.env.UPLOAD_DIR || path.join(process.cwd(), 'uploads');
@@ -16,13 +23,32 @@ export class UploadService {
     }
 
     async uploadImage(file: Express.Multer.File): Promise<{ url: string }> {
-        const ext = path.extname(file.originalname) || '.jpg';
-        const filename = `${uuidv4()}${ext}`;
+        const filename = `${uuidv4()}.webp`;
         const filePath = path.join(this.uploadDir, filename);
 
-        fs.writeFileSync(filePath, file.buffer);
+        try {
+            // Compress and convert to WebP
+            await sharp(file.buffer)
+                .resize(this.MAX_WIDTH, this.MAX_HEIGHT, {
+                    fit: 'inside',          // Maintain aspect ratio, fit within bounds
+                    withoutEnlargement: true // Don't upscale small images
+                })
+                .webp({ quality: this.QUALITY })
+                .toFile(filePath);
 
-        // Return relative URL — Nginx serves /uploads/ from the volume
+            const stats = fs.statSync(filePath);
+            const originalKB = Math.round(file.size / 1024);
+            const compressedKB = Math.round(stats.size / 1024);
+            this.logger.log(
+                `Image compressed: ${originalKB}KB → ${compressedKB}KB (${Math.round((1 - stats.size / file.size) * 100)}% reduction)`,
+            );
+        } catch (error) {
+            // Fallback: save original if sharp fails
+            this.logger.warn(`Sharp compression failed, saving original: ${error.message}`);
+            fs.writeFileSync(filePath, file.buffer);
+        }
+
+        // Return relative URL — served via /uploads/ route
         return { url: `/uploads/${filename}` };
     }
 
