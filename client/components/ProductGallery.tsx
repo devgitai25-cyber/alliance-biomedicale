@@ -34,7 +34,7 @@ export function ProductGallery({ images, productName, comparePrice }: ProductGal
                                 alt={`${productName} - Vue ${i + 1}`}
                                 fill
                                 className="object-cover"
-                                unoptimized
+                                sizes="85vw"
                                 priority={i === 0}
                             />
                             {i === 0 && comparePrice && (
@@ -65,7 +65,7 @@ export function ProductGallery({ images, productName, comparePrice }: ProductGal
                         alt={`${productName}`}
                         fill
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
-                        unoptimized
+                        sizes="50vw"
                         priority
                     />
                     {comparePrice && (
@@ -116,7 +116,7 @@ export function ProductGallery({ images, productName, comparePrice }: ProductGal
                                     alt={`${productName} view ${i + 1}`}
                                     fill
                                     className="object-cover"
-                                    unoptimized
+                                    sizes="10vw"
                                 />
                             </button>
                         ))}

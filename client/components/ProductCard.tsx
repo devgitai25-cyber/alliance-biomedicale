@@ -43,7 +43,7 @@ export function ProductCard({
                         alt={name}
                         fill
                         className="object-cover group-hover:scale-103 transition-transform duration-500 ease-out"
-                        unoptimized
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                 ) : (
                     <div className="absolute inset-0 flex items-center justify-center text-5xl text-gray-light/50">

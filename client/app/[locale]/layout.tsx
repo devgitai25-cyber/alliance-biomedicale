@@ -6,6 +6,7 @@ import { WishlistProvider } from '@/context/WishlistContext';
 import { CartDrawer } from '@/components/CartDrawer';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import { TopLoader } from '@/components/TopLoader';
 
 export const metadata: Metadata = {
     title: 'Alliance Biomédicale - Cosmétiques & Soins Bio',
@@ -25,6 +26,7 @@ export default async function LocaleLayout({
     return (
         <html lang={locale} suppressHydrationWarning>
             <body className="min-h-screen">
+                <TopLoader />
                 <AuthProvider>
                     <CartProvider>
                         <WishlistProvider>

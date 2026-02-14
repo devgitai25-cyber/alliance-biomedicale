@@ -20,6 +20,10 @@ const nextConfig: NextConfig = {
         hostname: 'alliance-biomedicale.com',
       },
       {
+        protocol: 'https',
+        hostname: 'api.alliance-biomedicale.com',
+      },
+      {
         protocol: 'http',
         hostname: 'localhost',
         port: '3001',

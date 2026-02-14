@@ -32,7 +32,7 @@ export async function getProducts(category?: string): Promise<Product[]> {
         if (category) query.append('categoryId', category);
 
         const res = await fetch(`${API_URL}/products?${query.toString()}`, {
-            cache: 'no-store' // Disable cache for dev
+            next: { revalidate: 60 }
         });
 
         if (!res.ok) throw new Error('Failed to fetch products');
@@ -48,7 +48,7 @@ export async function getProducts(category?: string): Promise<Product[]> {
 export async function getProduct(slug: string): Promise<Product | undefined> {
     try {
         const res = await fetch(`${API_URL}/products/slug/${slug}`, {
-            cache: 'no-store' // Always fresh for details
+            next: { revalidate: 60 }
         });
 
         if (!res.ok) return undefined;
@@ -83,7 +83,7 @@ export async function getProductById(id: string): Promise<any> {
 export async function getFeaturedProducts(): Promise<Product[]> {
     try {
         const res = await fetch(`${API_URL}/products?featured=true`, {
-            cache: 'no-store'
+            next: { revalidate: 60 }
         });
 
         if (!res.ok) throw new Error('Failed to fetch featured products');
@@ -248,14 +248,14 @@ function mapCategory(c: any): import('@/types').Category {
 }
 
 export async function getCategories(): Promise<import('@/types').Category[]> {
-    const res = await fetch(`${API_URL}/categories`, { cache: 'no-store' });
+    const res = await fetch(`${API_URL}/categories`, { next: { revalidate: 300 } });
     if (!res.ok) throw new Error('Failed to fetch categories');
     const data = await res.json();
     return data.map((c: any) => mapCategory(c));
 }
 
 export async function getCategory(id: string): Promise<any> {
-    const res = await fetch(`${API_URL}/categories/${id}`, { cache: 'no-store' });
+    const res = await fetch(`${API_URL}/categories/${id}`, { next: { revalidate: 300 } });
     if (!res.ok) throw new Error('Failed to fetch category');
     return res.json();
 }
@@ -431,7 +431,7 @@ export async function updateOrderStatus(
 // Settings
 export async function getPublicSettings(): Promise<Record<string, any>> {
     try {
-        const res = await fetch(`${API_URL}/settings/public`, { cache: 'no-store' });
+        const res = await fetch(`${API_URL}/settings/public`, { next: { revalidate: 300 } });
         if (!res.ok) throw new Error('Failed to fetch settings');
         return res.json();
     } catch (error) {

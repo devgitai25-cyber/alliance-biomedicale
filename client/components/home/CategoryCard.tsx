@@ -30,7 +30,6 @@ export function CategoryCard({ id, name, image, index }: CategoryCardProps) {
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                         sizes="(max-width: 768px) 50vw, 25vw"
-                        unoptimized
                     />
                 ) : (
                     <div className="absolute inset-0 flex items-center justify-center bg-gray-50 text-6xl text-teal-light/20">

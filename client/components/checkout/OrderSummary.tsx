@@ -49,7 +49,7 @@ export function OrderSummary() {
                                 alt={item.product.name}
                                 fill
                                 className="object-cover transition-transform duration-500 group-hover:scale-105"
-                                unoptimized
+                                sizes="80px"
                             />
                             <span className="absolute -top-1 -right-1 bg-dark text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-white shadow-sm">
                                 {item.quantity}
