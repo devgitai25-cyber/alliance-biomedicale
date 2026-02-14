@@ -11,9 +11,10 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Build arguments become environment variables during build
-ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_API_URL=https://api.alliance-biomedicale.com/api
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
+RUN echo "Building with API URL: $NEXT_PUBLIC_API_URL"
 RUN npm run build
 
 # ---- Stage 3: Production Runner ----
