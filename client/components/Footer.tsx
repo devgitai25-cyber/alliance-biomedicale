@@ -116,7 +116,7 @@ export async function Footer() {
                         {/* Modern SVG Social Icons */}
                         <div className="flex gap-3 mb-8">
                             <a
-                                href="https://www.facebook.com"
+                                href="https://www.facebook.com/AllianceBiomedicale/"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-10 h-10 rounded-full border border-gray-light hover:border-teal-main flex items-center justify-center text-gray-text hover:text-teal-main hover:bg-teal-soft/30 transition-all duration-300"
@@ -127,7 +127,7 @@ export async function Footer() {
                                 </svg>
                             </a>
                             <a
-                                href="https://www.instagram.com"
+                                href="https://www.instagram.com/alliance_biomedicale/"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-10 h-10 rounded-full border border-gray-light hover:border-teal-main flex items-center justify-center text-gray-text hover:text-teal-main hover:bg-teal-soft/30 transition-all duration-300"
