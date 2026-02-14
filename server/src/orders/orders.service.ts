@@ -144,6 +144,7 @@ export class OrdersService {
                         shippingCity: city,
                         shippingZip: postalCode,
                         shippingCountry: createOrderDto.country,
+                        email: createOrderDto.email, // Save contact email
                         items: {
                             create: items.map((item) => {
                                 const product = products.find(p => p.id === item.productId)!;

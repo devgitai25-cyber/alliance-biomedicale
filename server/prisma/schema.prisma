@@ -131,6 +131,9 @@ model Order {
   shippingZip     String?
   shippingCountry String?
   
+  // Contact info for this specific order
+  email           String?      // Email provided at checkout
+  
   notes           String?
   locale          String      @default("fr") // Language used at checkout
   
@@ -164,7 +167,6 @@ enum OrderStatus {
 // Order items
 model OrderItem {
   id        String   @id @default(cuid())
-  productName String? // Snapshot of product name
   quantity  Int
   price     Float    // Price at time of order
   subtotal  Float
