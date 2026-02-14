@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { validateEmail, validateRequired } from '@/lib/validation';
@@ -9,6 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 
 export default function LoginPage({ params }: { params: Promise<{ locale: string }> }) {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { login } = useAuth(); // Get login function
     const [isLoading, setIsLoading] = useState(false);
     const [globalError, setGlobalError] = useState('');
@@ -73,12 +74,14 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
             // Use Context Login
             login(data.accessToken, data.user);
 
-            const { locale } = await params;
-            // Admin redirect check
-            if (data.user.isAdmin) {
+            // Redirect: check for callbackUrl first, then admin/profile
+            const callbackUrl = searchParams.get('callbackUrl');
+            if (callbackUrl) {
+                router.push(decodeURIComponent(callbackUrl));
+            } else if (data.user.isAdmin) {
                 router.push('/admin');
             } else {
-                router.push(`/${locale}/profile`);
+                router.push('/profile');
             }
 
         } catch (err: any) {
@@ -215,7 +218,7 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
                     <div className="mt-6 text-center">
                         <p className="text-sm text-gray-text font-body">
                             Pas encore de compte ?{' '}
-                            <Link href="/fr/register" className="font-medium text-teal-main hover:text-teal-dark transition-colors font-display">
+                            <Link href="/register" className="font-medium text-teal-main hover:text-teal-dark transition-colors font-display">
                                 Créer un compte gratuitement
                             </Link>
                         </p>

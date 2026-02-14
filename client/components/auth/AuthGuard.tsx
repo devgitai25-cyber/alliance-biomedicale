@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { isAuthenticated } from '@/lib/auth';
 
 interface AuthGuardProps {
@@ -10,7 +10,7 @@ interface AuthGuardProps {
 
 export function AuthGuard({ children }: AuthGuardProps) {
     const router = useRouter();
-    const searchParams = useSearchParams();
+    const pathname = usePathname();
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -18,9 +18,13 @@ export function AuthGuard({ children }: AuthGuardProps) {
         const checkAuth = () => {
             const authenticated = isAuthenticated();
             if (!authenticated) {
+                // Detect current locale from pathname (e.g., /fr/checkout -> fr)
+                const pathParts = pathname.split('/');
+                const locale = pathParts[1] || 'fr';
+
                 // Redirect to login with callback URL
-                const callbackUrl = encodeURIComponent(window.location.pathname + window.location.search);
-                router.push(`/fr/login?callbackUrl=${callbackUrl}`);
+                const callbackUrl = encodeURIComponent(pathname);
+                router.push(`/${locale}/login?callbackUrl=${callbackUrl}`);
             } else {
                 setIsAuthorized(true);
             }
@@ -28,7 +32,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
         };
 
         checkAuth();
-    }, [router]);
+    }, [router, pathname]);
 
     if (isLoading) {
         return (
@@ -42,7 +46,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
     }
 
     if (!isAuthorized) {
-        return null; // Don't render anything while redirecting
+        return null;
     }
 
     return <>{children}</>;

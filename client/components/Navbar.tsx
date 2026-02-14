@@ -23,6 +23,11 @@ export function Navbar() {
         setIsMounted(true);
     }, []);
 
+    // Auto-close mobile menu on route change
+    useEffect(() => {
+        setMobileMenuOpen(false);
+    }, [pathname]);
+
     // Helper for handleLogout is now just logout from context
     const handleLogout = () => {
         logout();
