@@ -1,5 +1,6 @@
 import { Controller, Post, Body, HttpCode, HttpStatus, Get, UseGuards, Req, Res } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
 import { JwtAuthGuard, AdminGuard } from './guards/auth.guard';
@@ -9,12 +10,14 @@ export class AuthController {
     constructor(private authService: AuthService) { }
 
     @Post('register')
+    @Throttle({ default: { ttl: 60000, limit: 5 } }) // 5 registrations per minute
     async register(@Body() registerDto: RegisterDto) {
         return this.authService.register(registerDto);
     }
 
     @Post('login')
     @HttpCode(HttpStatus.OK)
+    @Throttle({ default: { ttl: 60000, limit: 5 } }) // 5 login attempts per minute
     async login(@Body() loginDto: LoginDto) {
         return this.authService.login(loginDto);
     }
