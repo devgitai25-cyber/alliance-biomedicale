@@ -5,6 +5,14 @@ import { AuthGuard } from '@nestjs/passport';
 export class JwtAuthGuard extends AuthGuard('jwt') { }
 
 @Injectable()
+export class OptionalJwtAuthGuard extends AuthGuard('jwt') {
+    handleRequest(err: any, user: any) {
+        // Don't throw on missing/invalid token — just return null
+        return user || null;
+    }
+}
+
+@Injectable()
 export class AdminGuard implements CanActivate {
     canActivate(context: ExecutionContext): boolean {
         const request = context.switchToHttp().getRequest();
