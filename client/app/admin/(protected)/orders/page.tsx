@@ -9,9 +9,12 @@ interface Order {
     createdAt: string;
     total: number;
     status: string;
-    firstName: string;
-    lastName: string;
-    email: string;
+    shippingName: string;
+    user: {
+        firstName: string;
+        lastName: string;
+        email: string;
+    };
 }
 
 export default function AdminOrdersPage() {
@@ -143,8 +146,8 @@ export default function AdminOrdersPage() {
                                             {new Date(order.createdAt).toLocaleDateString('fr-FR')}
                                         </td>
                                         <td className="px-6 py-4">
-                                            <p className="font-medium text-dark">{order.firstName} {order.lastName}</p>
-                                            <p className="text-xs text-gray-500">{order.email}</p>
+                                            <p className="font-medium text-dark">{order.user?.firstName} {order.user?.lastName} <span className='text-xs text-gray-400'>({order.shippingName})</span></p>
+                                            <p className="text-xs text-gray-500">{order.user?.email}</p>
                                         </td>
                                         <td className="px-6 py-4 font-bold text-dark">
                                             {order.total.toFixed(3)} TND

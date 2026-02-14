@@ -182,6 +182,13 @@ export class OrdersService {
         return this.prisma.order.findMany({
             orderBy: { createdAt: 'desc' },
             include: {
+                user: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                        email: true,
+                    },
+                },
                 items: {
                     include: {
                         product: true,
@@ -195,6 +202,14 @@ export class OrdersService {
         const order = await this.prisma.order.findUnique({
             where: { id },
             include: {
+                user: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                        email: true,
+                        phone: true,
+                    },
+                },
                 items: {
                     include: {
                         product: true,
@@ -252,6 +267,36 @@ export class OrdersService {
         }
 
         this.logger.log(`Updating order ${order.orderNumber} status from ${order.status} to ${updateDto.status}`);
+
+        // If cancelling, restore stock
+        if (updateDto.status === 'CANCELLED' && order.status !== 'CANCELLED') {
+            await this.prisma.$transaction(async (tx) => {
+                // 1. Update order status
+                await tx.order.update({
+                    where: { id: orderId },
+                    data: { status: 'CANCELLED' },
+                });
+
+                // 2. Restore stock
+                const orderWithItems = await tx.order.findUnique({
+                    where: { id: orderId },
+                    include: { items: true },
+                });
+
+                if (orderWithItems) {
+                    for (const item of orderWithItems.items) {
+                        await tx.product.update({
+                            where: { id: item.productId },
+                            data: {
+                                stock: { increment: item.quantity },
+                            },
+                        });
+                    }
+                }
+            });
+
+            return this.findOne(orderId);
+        }
 
         return this.prisma.order.update({
             where: { id: orderId },
