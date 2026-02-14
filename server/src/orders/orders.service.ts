@@ -140,6 +140,7 @@ export class OrdersService {
                                 const product = products.find(p => p.id === item.productId)!;
                                 return {
                                     productId: item.productId,
+                                    productName: product.name, // Snapshot of product name
                                     quantity: item.quantity,
                                     price: Number(product.price), // Use actual price from DB
                                     subtotal: Number(product.price) * item.quantity,
