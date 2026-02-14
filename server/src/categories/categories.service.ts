@@ -93,22 +93,40 @@ export class CategoriesService {
                 );
             }
         } else {
-            // Check if any products in this category have associated orders
-            // We cannot delete products that have been ordered (integrity)
-            const productsWithOrders = await this.prisma.product.count({
+            // Get all product IDs in this category
+            const products = await this.prisma.product.findMany({
+                where: { categoryId: id },
+                select: { id: true },
+            });
+            const productIds = products.map((p) => p.id);
+
+            // Check for active (non-cancelled) orders containing these products
+            const activeOrders = await this.prisma.order.findMany({
                 where: {
-                    categoryId: id,
-                    orderItems: {
-                        some: {},
+                    items: {
+                        some: {
+                            productId: { in: productIds },
+                        },
                     },
+                    status: { not: 'CANCELLED' },
                 },
+                select: { orderNumber: true },
             });
 
-            if (productsWithOrders > 0) {
+            if (activeOrders.length > 0) {
+                const orderNumbers = activeOrders.map((o) => o.orderNumber).join(', ');
                 throw new ConflictException(
-                    `Cannot delete category. ${productsWithOrders} product(s) have existing orders and cannot be removed.`,
+                    `Deletion blocked by active Orders: ${orderNumbers}. Please cancel these orders first.`,
                 );
             }
+
+            // Clean up OrderItems from CANCELLED orders to satisfy foreign key constraints
+            await this.prisma.orderItem.deleteMany({
+                where: {
+                    productId: { in: productIds },
+                    order: { status: 'CANCELLED' },
+                },
+            });
         }
 
         await this.prisma.category.delete({

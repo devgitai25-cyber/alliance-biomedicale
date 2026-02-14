@@ -164,6 +164,7 @@ enum OrderStatus {
 // Order items
 model OrderItem {
   id        String   @id @default(cuid())
+  productName String? // Snapshot of product name
   quantity  Int
   price     Float    // Price at time of order
   subtotal  Float
