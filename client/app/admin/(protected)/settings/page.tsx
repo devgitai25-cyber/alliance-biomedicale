@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { getAllSettings, updateSetting } from '@/lib/api';
 
 export default function SettingsPage() {
-    const [activeTab, setActiveTab] = useState<'general' | 'payment' | 'shipping'>('general');
+    const [activeTab, setActiveTab] = useState<'general' | 'shipping'>('general');
     const [isSaving, setIsSaving] = useState(false);
 
     const [settings, setSettings] = useState({
@@ -15,7 +15,6 @@ export default function SettingsPage() {
         currency: 'TND',
         shippingCost: 0,
         freeShippingThreshold: 0,
-        paymeeApiKey: '',
     });
 
     useEffect(() => {
@@ -33,7 +32,7 @@ export default function SettingsPage() {
                         site_phone: 'sitePhone',
                         shipping_cost: 'shippingCost',
                         free_shipping_threshold: 'freeShippingThreshold',
-                        paymee_api_key: 'paymeeApiKey',
+
                     };
                     const stateKey = keyMap[s.key];
                     // @ts-ignore
@@ -71,7 +70,7 @@ export default function SettingsPage() {
                 sitePhone: 'site_phone',
                 shippingCost: 'shipping_cost',
                 freeShippingThreshold: 'free_shipping_threshold',
-                paymeeApiKey: 'paymee_api_key',
+
             };
 
             const promises = Object.entries(settings).map(([key, value]) => {
@@ -117,15 +116,7 @@ export default function SettingsPage() {
                     >
                         Shipping
                     </button>
-                    <button
-                        onClick={() => setActiveTab('payment')}
-                        className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'payment'
-                            ? 'border-primary text-primary'
-                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                            }`}
-                    >
-                        Payment
-                    </button>
+
                 </nav>
             </div>
 
@@ -227,35 +218,6 @@ export default function SettingsPage() {
                 </div>
             )}
 
-            {/* Payment Settings */}
-            {activeTab === 'payment' && (
-                <div className="bg-white rounded-lg shadow p-6 max-w-2xl">
-                    <h2 className="text-xl font-semibold mb-4">Payment Settings</h2>
-                    <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Paymee API Key
-                            </label>
-                            <input
-                                type="password"
-                                name="paymeeApiKey"
-                                value={settings.paymeeApiKey}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                placeholder="Enter your Paymee API key"
-                            />
-                            <p className="text-xs text-gray-500 mt-1">
-                                Your Paymee API key for payment processing
-                            </p>
-                        </div>
-                        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                            <p className="text-sm text-yellow-800">
-                                ⚠️ Keep your API keys secure. Never share them publicly.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* Save Button */}
             <div className="mt-6">
