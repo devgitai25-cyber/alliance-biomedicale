@@ -9,8 +9,11 @@ export class OrdersController {
     constructor(private readonly ordersService: OrdersService) { }
 
     @Post()
-    create(@Body() createOrderDto: CreateOrderDto) {
-        return this.ordersService.create(createOrderDto);
+    create(@Body() createOrderDto: CreateOrderDto, @Req() req) {
+        // Extract userId if available (custom middleware might attach user even without guard)
+        // Or check header manualy if JwtAuthGuard isn't used
+        const userId = req.user?.id;
+        return this.ordersService.create(createOrderDto, userId);
     }
 
     @Get()

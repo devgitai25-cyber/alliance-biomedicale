@@ -12,7 +12,7 @@ export class OrdersService {
         private promotionsService: PromotionsService
     ) { }
 
-    async create(createOrderDto: CreateOrderDto) {
+    async create(createOrderDto: CreateOrderDto, userId?: string) {
         const { items, total, email, firstName, lastName, phone, address, city, postalCode, promoCode } = createOrderDto;
 
         // Generate Order Number
@@ -58,7 +58,16 @@ export class OrdersService {
                 }
 
                 // 3. Find or create user
-                let user = await tx.user.findUnique({ where: { email } });
+                let user;
+
+                if (userId) {
+                    user = await tx.user.findUnique({ where: { id: userId } });
+                }
+
+                if (!user) {
+                    user = await tx.user.findUnique({ where: { email } });
+                }
+
                 if (!user) {
                     this.logger.log(`Creating new user for ${email}`);
                     // Create checkout user (password placeholder for guest checkout)
