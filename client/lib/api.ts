@@ -93,7 +93,8 @@ export async function getProductById(id: string): Promise<any> {
         });
 
         if (!res.ok) throw new Error('Failed to fetch product');
-        return res.json();
+        const data = await res.json();
+        return mapProduct(data);
     } catch (error) {
         console.error('getProductById error:', error);
         throw error;
