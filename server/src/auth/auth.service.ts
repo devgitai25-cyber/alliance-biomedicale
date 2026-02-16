@@ -1,14 +1,17 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
+import { EmailService } from '../email/email.service';
 import * as bcrypt from 'bcryptjs';
-import { RegisterDto, LoginDto, AuthResponseDto } from './dto/auth.dto';
+import * as crypto from 'crypto';
+import { RegisterDto, LoginDto, AuthResponseDto, ForgotPasswordDto, ResetPasswordDto } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
     constructor(
         private prisma: PrismaService,
         private jwtService: JwtService,
+        private emailService: EmailService,
     ) { }
 
     async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
@@ -216,5 +219,93 @@ export class AuthService {
                 isAdmin: newUser.isAdmin,
             }
         };
+    }
+
+    async forgotPassword(forgotPasswordDto: ForgotPasswordDto, locale: string = 'fr'): Promise<{ message: string }> {
+        const { email } = forgotPasswordDto;
+
+        // Find user by email
+        const user = await this.prisma.user.findUnique({
+            where: { email },
+        });
+
+        // Always return success message to prevent email enumeration
+        const successMessage = locale === 'ar'
+            ? 'إذا كان البريد الإلكتروني موجودًا، فستتلقى رابط إعادة تعيين كلمة المرور.'
+            : 'Si cet email existe, vous recevrez un lien de réinitialisation.';
+
+        if (!user) {
+            // Don't reveal that user doesn't exist
+            return { message: successMessage };
+        }
+
+        // Generate secure random token
+        const resetToken = crypto.randomBytes(32).toString('hex');
+
+        // Hash token before storing
+        const hashedToken = await bcrypt.hash(resetToken, 10);
+
+        // Set expiration to 1 hour from now
+        const expiresAt = new Date(Date.now() + 3600000); // 1 hour
+
+        // Save hashed token and expiration to database
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: {
+                resetPasswordToken: hashedToken,
+                resetPasswordExpires: expiresAt,
+            },
+        });
+
+        // Send email with plain token (only sent once, never stored)
+        try {
+            await this.emailService.sendPasswordResetEmail(email, resetToken, locale);
+        } catch (error) {
+            console.error('Failed to send reset email:', error);
+            // Don't throw error to prevent revealing email existence
+        }
+
+        return { message: successMessage };
+    }
+
+    async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<{ message: string }> {
+        const { token, newPassword } = resetPasswordDto;
+
+        // Find all users with non-expired reset tokens
+        const users = await this.prisma.user.findMany({
+            where: {
+                resetPasswordToken: { not: null },
+                resetPasswordExpires: { gte: new Date() },
+            },
+        });
+
+        // Find user with matching token
+        let matchedUser = null;
+        for (const user of users) {
+            const isValidToken = await bcrypt.compare(token, user.resetPasswordToken);
+            if (isValidToken) {
+                matchedUser = user;
+                break;
+            }
+        }
+
+        if (!matchedUser) {
+            throw new BadRequestException('Token invalide ou expiré');
+        }
+
+        // Hash new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update password and clear reset fields
+        await this.prisma.user.update({
+            where: { id: matchedUser.id },
+            data: {
+                password: hashedPassword,
+                resetPasswordToken: null,
+                resetPasswordExpires: null,
+            },
+        });
+
+        return { message: 'Mot de passe réinitialisé avec succès' };
     }
 }

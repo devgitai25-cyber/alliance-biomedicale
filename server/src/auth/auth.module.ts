@@ -6,10 +6,14 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { GoogleStrategy } from './google.strategy';
+import { EmailModule } from '../email/email.module';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
     imports: [
         PassportModule,
+        EmailModule,
+        PrismaModule,
         JwtModule.registerAsync({
             imports: [ConfigModule],
             useFactory: async (configService: ConfigService) => ({
@@ -26,3 +30,4 @@ import { GoogleStrategy } from './google.strategy';
     exports: [AuthService],
 })
 export class AuthModule { }
+

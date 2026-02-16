@@ -1,8 +1,8 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, UseGuards, Req, Res } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Get, UseGuards, Req, Res, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto } from './dto/auth.dto';
+import { RegisterDto, LoginDto, ForgotPasswordDto, ResetPasswordDto } from './dto/auth.dto';
 import { JwtAuthGuard, AdminGuard } from './guards/auth.guard';
 
 @Controller('auth')
@@ -44,5 +44,22 @@ export class AuthController {
     @UseGuards(JwtAuthGuard)
     async getProfile(@Req() req: any) {
         return this.authService.getProfile(req.user.id);
+    }
+
+    @Post('forgot-password')
+    @HttpCode(HttpStatus.OK)
+    @Throttle({ default: { ttl: 60000, limit: 3 } }) // 3 requests per minute
+    async forgotPassword(
+        @Body() forgotPasswordDto: ForgotPasswordDto,
+        @Query('locale') locale?: string,
+    ) {
+        return this.authService.forgotPassword(forgotPasswordDto, locale);
+    }
+
+    @Post('reset-password')
+    @HttpCode(HttpStatus.OK)
+    @Throttle({ default: { ttl: 60000, limit: 5 } }) // 5 requests per minute
+    async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+        return this.authService.resetPassword(resetPasswordDto);
     }
 }

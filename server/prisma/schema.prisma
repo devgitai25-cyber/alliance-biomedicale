@@ -20,6 +20,8 @@ model User {
   phone     String?
   googleId  String?  @unique // Google Authentication ID
   isAdmin   Boolean  @default(false)
+  resetPasswordToken   String?   // Hashed token for password reset
+  resetPasswordExpires DateTime? // Expiration time for reset token
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -28,6 +30,7 @@ model User {
   wishlist  Wishlist[]
 
   @@index([email])
+  @@index([resetPasswordToken])
 }
 
 // Category model for product organization

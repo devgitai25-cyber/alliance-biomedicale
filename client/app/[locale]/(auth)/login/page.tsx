@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, use } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
@@ -8,6 +8,7 @@ import { validateEmail, validateRequired } from '@/lib/validation';
 import { useAuth } from '@/context/AuthContext';
 
 export default function LoginPage({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = use(params);
     const router = useRouter();
     const searchParams = useSearchParams();
     const { login } = useAuth(); // Get login function
@@ -173,9 +174,9 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
                         </div>
 
                         <div className="text-sm">
-                            <a href="#" className="font-medium text-teal-main hover:text-teal-dark font-body transition-colors">
+                            <Link href={`/${locale}/forgot-password`} className="font-medium text-teal-main hover:text-teal-dark font-body transition-colors">
                                 Mot de passe oublié ?
-                            </a>
+                            </Link>
                         </div>
                     </div>
 
