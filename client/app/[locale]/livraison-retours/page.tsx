@@ -1,4 +1,5 @@
 import { Container } from '@/components/ui/Container';
+import { getPublicSettings } from '@/lib/api';
 
 interface DeliveryReturnsPageProps {
     params: Promise<{ locale: string }>;
@@ -6,6 +7,8 @@ interface DeliveryReturnsPageProps {
 
 export default async function DeliveryReturnsPage({ params }: DeliveryReturnsPageProps) {
     const { locale } = await params;
+    const settings = await getPublicSettings();
+    const siteEmail = settings.site_email || 'contact@alliance-bio.tn';
 
     return (
         <div className="bg-white min-h-screen">
@@ -84,7 +87,7 @@ export default async function DeliveryReturnsPage({ params }: DeliveryReturnsPag
 
                             <h3 className="font-semibold text-teal-dark mt-4">Comment effectuer un retour ?</h3>
                             <ol className="list-decimal list-inside space-y-2 pl-4">
-                                <li>Contactez notre service client à <a href="mailto:support@alliance-biomedicale.com" className="text-teal-main hover:underline">support@alliance-biomedicale.com</a> ou par téléphone pour signaler votre demande de retour.</li>
+                                <li>Contactez notre service client à <a href={`mailto:${siteEmail}`} className="text-teal-main hover:underline">{siteEmail}</a> ou par téléphone pour signaler votre demande de retour.</li>
                                 <li>Préparez votre colis en assurant que les produits sont bien protégés.</li>
                                 <li>Envoyez le colis à l'adresse qui vous sera communiquée par notre service client.</li>
                             </ol>

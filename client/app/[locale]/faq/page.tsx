@@ -1,4 +1,5 @@
 import { Container } from '@/components/ui/Container';
+import { getPublicSettings } from '@/lib/api';
 
 interface FAQPageProps {
     params: Promise<{ locale: string }>;
@@ -6,6 +7,8 @@ interface FAQPageProps {
 
 export default async function FAQPage({ params }: FAQPageProps) {
     const { locale } = await params;
+    const settings = await getPublicSettings();
+    const siteEmail = settings.site_email || 'contact@alliance-bio.tn';
 
     const faqs = [
         {
@@ -79,7 +82,7 @@ export default async function FAQPage({ params }: FAQPageProps) {
                             Notre équipe est là pour vous aider.
                         </p>
                         <a
-                            href="mailto:support@alliance-biomedicale.com"
+                            href={`mailto:${siteEmail}`}
                             className="inline-block bg-teal-main hover:bg-teal-dark text-white font-medium py-3 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl"
                         >
                             Contactez-nous
