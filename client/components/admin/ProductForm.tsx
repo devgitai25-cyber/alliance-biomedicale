@@ -27,7 +27,7 @@ export function ProductForm({ initialData = {}, isEdit = false }: ProductFormPro
         stock: initialData.stock || 0,
         categoryId: initialData.categoryId,
         imageUrl: initialData.images?.[0] || '',
-        featured: initialData.featured || false,
+        featured: initialData.isFeatured || false,
     });
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
