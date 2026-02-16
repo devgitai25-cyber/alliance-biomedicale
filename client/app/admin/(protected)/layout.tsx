@@ -175,7 +175,7 @@ export default function ProtectedAdminLayout({ children }: { children: React.Rea
                             <div className="p-4 border-t border-gray-100 bg-gray-50">
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className="w-10 h-10 bg-teal-soft rounded-full flex items-center justify-center text-teal-dark font-bold">
-                                        {user.firstName[0]}
+                                        {user.firstName && user.firstName.length > 0 ? user.firstName[0].toUpperCase() : 'U'}
                                     </div>
                                     <div>
                                         <p className="font-medium text-dark">{user.firstName} {user.lastName}</p>

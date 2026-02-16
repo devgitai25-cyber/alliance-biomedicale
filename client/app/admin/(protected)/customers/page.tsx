@@ -208,7 +208,12 @@ export default function CustomersPage() {
                                                 <div className="flex items-center gap-3">
                                                     <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shadow-sm ${user.isAdmin ? 'bg-purple-100 text-purple-700' : 'bg-teal-50 text-teal-700'
                                                         }`}>
-                                                        {(user.firstName?.[0] || user.email[0]).toUpperCase()}
+                                                        {(user.firstName && user.firstName.length > 0
+                                                            ? user.firstName[0]
+                                                            : user.email && user.email.length > 0
+                                                                ? user.email[0]
+                                                                : 'U'
+                                                        ).toUpperCase()}
                                                     </div>
                                                     <div className="min-w-0">
                                                         <p className="font-medium text-dark truncate">
