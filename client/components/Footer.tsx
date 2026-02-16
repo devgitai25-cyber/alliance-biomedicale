@@ -148,12 +148,12 @@ export async function Footer() {
                         <ul className="space-y-3 text-gray-text text-sm font-body">
 
                             <li>
-                                <a href="/privacy-policy" className="hover:text-teal-main transition-colors duration-300 inline-block">
+                                <a href="https://alliance-biomedicale.com/fr/privacy-policy" className="hover:text-teal-main transition-colors duration-300 inline-block">
                                     Politique de confidentialité
                                 </a>
                             </li>
                             <li>
-                                <a href="/terms-of-service" className="hover:text-teal-main transition-colors duration-300 inline-block">
+                                <a href="https://alliance-biomedicale.com/fr/terms-of-service" className="hover:text-teal-main transition-colors duration-300 inline-block">
                                     Conditions générales d’utilisation
                                 </a>
                             </li>
