@@ -45,6 +45,26 @@ export async function getProducts(category?: string): Promise<Product[]> {
     }
 }
 
+export async function getAdminProducts(): Promise<Product[]> {
+    try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        const res = await fetch(`${API_URL}/products`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+            cache: 'no-store'
+        });
+
+        if (!res.ok) throw new Error('Failed to fetch products');
+
+        const data = await res.json();
+        return data.map(mapProduct);
+    } catch (error) {
+        console.error('getAdminProducts error:', error);
+        return [];
+    }
+}
+
 export async function getProduct(slug: string): Promise<Product | undefined> {
     try {
         const res = await fetch(`${API_URL}/products/slug/${slug}`, {

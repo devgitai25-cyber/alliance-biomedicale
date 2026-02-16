@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { ProductTable } from '@/components/admin/ProductTable';
 import { Button } from '@/components/ui/Button';
 import { Product } from '@/types';
-import { getProducts, deleteProduct } from '@/lib/api';
+import { getAdminProducts, deleteProduct } from '@/lib/api';
 
 export default function AdminProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -13,10 +13,8 @@ export default function AdminProductsPage() {
     useEffect(() => {
         const loadProducts = async () => {
             try {
-                // Fetch all products
-                // We're re-using the public API for now. 
-                // Ideally, an admin specific endpoint would return stock, status (active/inactive), etc.
-                const data = await getProducts();
+                // Fetch all products with admin-specific API (no cache)
+                const data = await getAdminProducts();
                 setProducts(data);
             } catch (error) {
                 console.error('Failed to load products:', error);
