@@ -232,7 +232,7 @@ export function ProductForm({ initialData = {}, isEdit = false }: ProductFormPro
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Promo (opt)</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Prix Original (opt)</label>
                             <input
                                 type="number"
                                 name="comparePrice"
