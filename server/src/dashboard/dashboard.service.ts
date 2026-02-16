@@ -14,7 +14,7 @@ export class DashboardService {
             totalRevenue,
             recentOrders
         ] = await Promise.all([
-            this.prisma.product.count(),
+            this.prisma.product.count({ where: { active: true } }),
             this.prisma.order.count(),
             this.prisma.user.count({
                 where: { isAdmin: false }
