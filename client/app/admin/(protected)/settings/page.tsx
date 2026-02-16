@@ -51,7 +51,7 @@ export default function SettingsPage() {
                 }
             } catch (error: any) {
                 console.error("Failed to load settings", error);
-                setError(error.message || 'Failed to load settings');
+                setError(error.message || 'Échec du chargement des paramètres');
             }
         };
         fetchSettings();
@@ -88,10 +88,10 @@ export default function SettingsPage() {
             });
 
             await Promise.all(promises);
-            setSuccess('Settings saved successfully!');
+            setSuccess('Paramètres enregistrés avec succès !');
         } catch (error: any) {
             console.error('Failed to save settings', error);
-            setError(error.message || 'Failed to save settings');
+            setError(error.message || 'Échec de l\'enregistrement des paramètres');
         } finally {
             setIsSaving(false);
         }
@@ -99,7 +99,7 @@ export default function SettingsPage() {
 
     return (
         <div className="p-8">
-            <h1 className="text-3xl font-bold mb-6">Settings</h1>
+            <h1 className="text-3xl font-bold mb-6">Paramètres</h1>
 
             {error && (
                 <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-red-600">
@@ -123,7 +123,7 @@ export default function SettingsPage() {
                             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                             }`}
                     >
-                        General
+                        Général
                     </button>
                     <button
                         onClick={() => setActiveTab('shipping')}
@@ -132,7 +132,7 @@ export default function SettingsPage() {
                             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                             }`}
                     >
-                        Shipping
+                        Livraison
                     </button>
 
                 </nav>
@@ -141,11 +141,11 @@ export default function SettingsPage() {
             {/* General Settings */}
             {activeTab === 'general' && (
                 <div className="bg-white rounded-lg shadow p-6 max-w-2xl">
-                    <h2 className="text-xl font-semibold mb-4">General Settings</h2>
+                    <h2 className="text-xl font-semibold mb-4">Paramètres Généraux</h2>
                     <div className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Site Name
+                                Nom du site
                             </label>
                             <input
                                 type="text"
@@ -157,7 +157,7 @@ export default function SettingsPage() {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Contact Email
+                                Email de contact
                             </label>
                             <input
                                 type="email"
@@ -169,7 +169,7 @@ export default function SettingsPage() {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Phone Number
+                                Numéro de téléphone
                             </label>
                             <input
                                 type="tel"
@@ -181,7 +181,7 @@ export default function SettingsPage() {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Currency
+                                Devise
                             </label>
                             <select
                                 name="currency"
@@ -189,9 +189,9 @@ export default function SettingsPage() {
                                 onChange={(e) => setSettings(prev => ({ ...prev, currency: e.target.value }))}
                                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                             >
-                                <option value="TND">Tunisian Dinar (TND)</option>
+                                <option value="TND">Dinar Tunisien (TND)</option>
                                 <option value="EUR">Euro (EUR)</option>
-                                <option value="USD">US Dollar (USD)</option>
+                                <option value="USD">Dollar Américain (USD)</option>
                             </select>
                         </div>
                     </div>
@@ -201,11 +201,11 @@ export default function SettingsPage() {
             {/* Shipping Settings */}
             {activeTab === 'shipping' && (
                 <div className="bg-white rounded-lg shadow p-6 max-w-2xl">
-                    <h2 className="text-xl font-semibold mb-4">Shipping Settings</h2>
+                    <h2 className="text-xl font-semibold mb-4">Paramètres de Livraison</h2>
                     <div className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Shipping Cost (TND)
+                                Frais de livraison (TND)
                             </label>
                             <input
                                 type="number"
@@ -216,11 +216,11 @@ export default function SettingsPage() {
                                 step="0.1"
                                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                             />
-                            <p className="text-xs text-gray-500 mt-1">Standard shipping fee charged to customers</p>
+                            <p className="text-xs text-gray-500 mt-1">Frais de livraison standard facturés aux clients</p>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Free Shipping Threshold (TND)
+                                Seuil de livraison gratuite (TND)
                             </label>
                             <input
                                 type="number"
@@ -230,7 +230,7 @@ export default function SettingsPage() {
                                 min="0"
                                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                             />
-                            <p className="text-xs text-gray-500 mt-1">Orders above this amount get free shipping</p>
+                            <p className="text-xs text-gray-500 mt-1">Les commandes supérieures à ce montant bénéficient de la livraison gratuite</p>
                         </div>
                     </div>
                 </div>
@@ -240,7 +240,7 @@ export default function SettingsPage() {
             {/* Save Button */}
             <div className="mt-6">
                 <Button onClick={handleSave} isLoading={isSaving}>
-                    Save Settings
+                    Enregistrer les paramètres
                 </Button>
             </div>
         </div>
