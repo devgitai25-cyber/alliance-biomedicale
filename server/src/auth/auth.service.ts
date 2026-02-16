@@ -280,8 +280,11 @@ export class AuthService {
         });
 
         // Find user with matching token
-        let matchedUser = null;
+        let matchedUser: typeof users[0] | null = null;
         for (const user of users) {
+            // Skip if resetPasswordToken is null (shouldn't happen due to query, but TypeScript safety)
+            if (!user.resetPasswordToken) continue;
+
             const isValidToken = await bcrypt.compare(token, user.resetPasswordToken);
             if (isValidToken) {
                 matchedUser = user;
