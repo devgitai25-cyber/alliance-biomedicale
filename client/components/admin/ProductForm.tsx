@@ -27,6 +27,7 @@ export function ProductForm({ initialData = {}, isEdit = false }: ProductFormPro
         stock: initialData.stock || 0,
         categoryId: initialData.categoryId,
         imageUrl: initialData.images?.[0] || '',
+        featured: initialData.featured || false,
     });
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -48,6 +49,11 @@ export function ProductForm({ initialData = {}, isEdit = false }: ProductFormPro
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, checked } = e.target;
+        setFormData(prev => ({ ...prev, [name]: checked }));
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,6 +95,8 @@ export function ProductForm({ initialData = {}, isEdit = false }: ProductFormPro
             } else {
                 throw new Error('Veuillez sélectionner une catégorie');
             }
+
+            data.append('featured', String(formData.featured));
 
             if (selectedFile) {
                 data.append('image', selectedFile);
@@ -244,6 +252,22 @@ export function ProductForm({ initialData = {}, isEdit = false }: ProductFormPro
                                 className="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
                             />
                         </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-gray-100">
+                        <label className="flex items-start gap-3 cursor-pointer group">
+                            <input
+                                type="checkbox"
+                                name="featured"
+                                checked={formData.featured}
+                                onChange={handleCheckboxChange}
+                                className="mt-1 h-5 w-5 rounded border-gray-300 text-teal-main focus:ring-2 focus:ring-teal-main focus:ring-offset-0 transition-colors cursor-pointer"
+                            />
+                            <div className="flex-1">
+                                <span className="block text-sm font-medium text-gray-700 group-hover:text-teal-dark transition-colors">Produit en Vedette</span>
+                                <span className="block text-xs text-gray-500 mt-0.5">Afficher dans la section "Nos Favoris" sur la page d'accueil</span>
+                            </div>
+                        </label>
                     </div>
 
                     <div>
