@@ -261,6 +261,7 @@ function mapCategory(c: any): import('@/types').Category {
         name: c.name,
         description: c.description,
         image: c.image,
+        displayOrder: c.displayOrder,
         products: c.products ? c.products.map(mapProduct) : [],
         _count: c._count,
     };
