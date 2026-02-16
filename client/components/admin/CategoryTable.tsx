@@ -100,8 +100,7 @@ export function CategoryTable({ categories, onDelete }: CategoryTableProps) {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-gray-600">
-                                        {/* @ts-ignore - displayOrder might be missing in type definition but present in API */}
-                                        {category.displayOrder || '-'}
+                                        {category.displayOrder ?? '-'}
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex justify-end items-center gap-4 text-sm font-medium">
