@@ -1,9 +1,16 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { getPublicSettings } from '@/lib/api';
+import { getPublicSettings, getCategories } from '@/lib/api';
 
 export async function Footer() {
     const settings = await getPublicSettings();
+    const categories = await getCategories();
+
+    // Sort categories by displayOrder
+    const sortedCategories = categories.sort((a, b) =>
+        (a.displayOrder ?? 0) - (b.displayOrder ?? 0)
+    );
+
     const siteEmail = settings.site_email || 'contact@alliance-bio.tn';
     const sitePhone = settings.site_phone || '+216 71 123 456';
 
@@ -49,7 +56,7 @@ export async function Footer() {
                         </div>
                     </div>
 
-                    {/* Navigation */}
+                    {/* Navigation - Dynamic Categories */}
                     <div>
                         <h3 className="font-display font-semibold text-teal-dark mb-5 text-sm uppercase tracking-luxury">
                             Navigation
@@ -57,24 +64,19 @@ export async function Footer() {
                         <ul className="space-y-3 text-gray-text text-sm font-body">
                             <li>
                                 <Link href="/products" className="hover:text-teal-main transition-colors duration-300 inline-block">
-                                    Nos Produits
+                                    Tous les Produits
                                 </Link>
                             </li>
-                            <li>
-                                <Link href="/products?category=soins-visage" className="hover:text-teal-main transition-colors duration-300 inline-block">
-                                    Soins Visage
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/products?category=soins-corps" className="hover:text-teal-main transition-colors duration-300 inline-block">
-                                    Soins Corps
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/products?category=anti-age" className="hover:text-teal-main transition-colors duration-300 inline-block">
-                                    Anti-Âge
-                                </Link>
-                            </li>
+                            {sortedCategories.slice(0, 6).map((category) => (
+                                <li key={category.id}>
+                                    <Link
+                                        href={`/products?category=${category.slug}`}
+                                        className="hover:text-teal-main transition-colors duration-300 inline-block"
+                                    >
+                                        {category.name}
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
 
