@@ -70,7 +70,7 @@ export async function Footer() {
                             {sortedCategories.slice(0, 6).map((category) => (
                                 <li key={category.id}>
                                     <Link
-                                        href={`/products?category=${category.slug}`}
+                                        href={`/products?category=${category.id}`}
                                         className="hover:text-teal-main transition-colors duration-300 inline-block"
                                     >
                                         {category.name}
