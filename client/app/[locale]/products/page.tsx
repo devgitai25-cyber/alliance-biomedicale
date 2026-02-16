@@ -39,7 +39,11 @@ export default async function ProductsPage({ params, searchParams }: ProductsPag
     } else if (sort === 'name') {
         filteredProducts = [...filteredProducts].sort((a, b) => a.name.localeCompare(b.name));
     } else if (sort === 'featured') {
-        filteredProducts = [...filteredProducts].sort((a, b) => (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0));
+        filteredProducts = [...filteredProducts].sort((a, b) => {
+            const aFeatured = a.isFeatured ? 1 : 0;
+            const bFeatured = b.isFeatured ? 1 : 0;
+            return bFeatured - aFeatured; // Featured (1) comes before non-featured (0)
+        });
     }
 
     // Find selected category for breadcrumbs
