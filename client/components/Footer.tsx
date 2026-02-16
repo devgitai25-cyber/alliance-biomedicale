@@ -148,14 +148,14 @@ export async function Footer() {
                         <ul className="space-y-3 text-gray-text text-sm font-body">
 
                             <li>
-                                <Link href="/privacy-policy" className="hover:text-teal-main transition-colors duration-300 inline-block">
+                                <a href="/privacy-policy" className="hover:text-teal-main transition-colors duration-300 inline-block">
                                     Politique de confidentialité
-                                </Link>
+                                </a>
                             </li>
                             <li>
-                                <Link href="/terms-of-service" className="hover:text-teal-main transition-colors duration-300 inline-block">
+                                <a href="/terms-of-service" className="hover:text-teal-main transition-colors duration-300 inline-block">
                                     Conditions générales d’utilisation
-                                </Link>
+                                </a>
                             </li>
                         </ul>
 
