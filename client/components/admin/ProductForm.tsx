@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Product } from '@/types';
 import { createProduct, updateProduct, getCategories } from '@/lib/api';
+import { resolveImageUrl } from '@/lib/image';
 
 interface ProductFormProps {
     initialData?: Partial<Product>;
@@ -31,7 +32,9 @@ export function ProductForm({ initialData = {}, isEdit = false }: ProductFormPro
     });
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [previewUrl, setPreviewUrl] = useState<string>(initialData.images?.[0] || '');
+    const [previewUrl, setPreviewUrl] = useState<string>(
+        initialData.images?.[0] ? resolveImageUrl(initialData.images[0]) : ''
+    );
     const [categories, setCategories] = useState<any[]>([]);
 
     useEffect(() => {

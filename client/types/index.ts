@@ -26,6 +26,7 @@ export interface Category {
     name: string;
     description?: string;
     image?: string;
+    displayOrder?: number;
     products?: Product[];
     _count?: {
         products: number;
