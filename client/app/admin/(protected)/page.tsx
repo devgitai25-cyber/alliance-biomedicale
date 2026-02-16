@@ -15,27 +15,51 @@ interface DashboardStats {
 export default function AdminDashboardPage() {
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string>('');
 
     useEffect(() => {
-        const loadStats = async () => {
-            try {
-                const data = await getDashboardStats();
-                setStats(data);
-            } catch (error) {
-                console.error('Failed to load dashboard stats:', error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
         loadStats();
     }, []);
+
+    const loadStats = async () => {
+        try {
+            setIsLoading(true);
+            setError('');
+            const data = await getDashboardStats();
+            setStats(data);
+        } catch (error: any) {
+            console.error('Failed to load dashboard stats:', error);
+            setError(error.message || 'Failed to load dashboard stats');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     if (isLoading) {
         return <div className="text-center py-20">Chargement...</div>;
     }
 
+    if (error) {
+        return (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center">
+                <div className="text-red-600 mb-4">
+                    <svg className="w-16 h-16 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="font-semibold text-lg">{error}</p>
+                </div>
+                <button
+                    onClick={loadStats}
+                    className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                >
+                    Retry
+                </button>
+            </div>
+        );
+    }
+
     if (!stats) {
-        return <div className="text-center py-20 text-red-500">Erreur lors du chargement des données.</div>;
+        return <div className="text-center py-20 text-red-500">No data available.</div>;
     }
 
     return (
@@ -101,8 +125,8 @@ export default function AdminDashboardPage() {
                                 <div className="text-right">
                                     <p className="font-bold text-dark">{parseFloat(order.total).toFixed(2)} TND</p>
                                     <span className={`text-xs px-2 py-1 rounded-full ${order.status === 'DELIVERED' ? 'bg-green-100 text-green-700' :
-                                            order.status === 'CANCELLED' ? 'bg-red-100 text-red-700' :
-                                                'bg-yellow-100 text-yellow-700'
+                                        order.status === 'CANCELLED' ? 'bg-red-100 text-red-700' :
+                                            'bg-yellow-100 text-yellow-700'
                                         }`}>
                                         {order.status}
                                     </span>

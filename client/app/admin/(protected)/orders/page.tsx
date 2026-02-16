@@ -20,24 +20,26 @@ interface Order {
 export default function AdminOrdersPage() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string>('');
 
     useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/orders`);
-                if (res.ok) {
-                    const data = await res.json();
-                    setOrders(data);
-                }
-            } catch (error) {
-                console.error('Failed to fetch orders', error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
         fetchOrders();
     }, []);
+
+    const fetchOrders = async () => {
+        try {
+            setIsLoading(true);
+            setError('');
+            const { getAllOrders } = await import('@/lib/api');
+            const data = await getAllOrders();
+            setOrders(data);
+        } catch (error: any) {
+            console.error('Failed to fetch orders', error);
+            setError(error.message || 'Failed to load orders');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const [filter, setFilter] = useState('ALL');
 
@@ -110,68 +112,88 @@ export default function AdminOrdersPage() {
                 ))}
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden rounded-tl-none">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead className="bg-gray-50 text-gray-600 font-medium text-sm">
-                            <tr>
-                                <th className="px-6 py-4">ID Commande</th>
-                                <th className="px-6 py-4">Date</th>
-                                <th className="px-6 py-4">Client</th>
-                                <th className="px-6 py-4">Total</th>
-                                <th className="px-6 py-4">Statut</th>
-                                <th className="px-6 py-4 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                            {isLoading ? (
+            {error && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+                    <div className="text-red-600 mb-3">
+                        <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p className="font-medium">{error}</p>
+                    </div>
+                    <button
+                        onClick={fetchOrders}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                        Retry
+                    </button>
+                </div>
+            )}
+
+            {!error && (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden rounded-tl-none">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead className="bg-gray-50 text-gray-600 font-medium text-sm">
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                                        Chargement...
-                                    </td>
+                                    <th className="px-6 py-4">ID Commande</th>
+                                    <th className="px-6 py-4">Date</th>
+                                    <th className="px-6 py-4">Client</th>
+                                    <th className="px-6 py-4">Total</th>
+                                    <th className="px-6 py-4">Statut</th>
+                                    <th className="px-6 py-4 text-right">Actions</th>
                                 </tr>
-                            ) : filteredOrders.length === 0 ? (
-                                <tr>
-                                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                                        Aucune commande trouvée.
-                                    </td>
-                                </tr>
-                            ) : (
-                                filteredOrders.map((order) => (
-                                    <tr key={order.id} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4 font-mono text-sm text-gray-600">
-                                            #{order.id.slice(0, 8)}...
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-gray-600">
-                                            {new Date(order.createdAt).toLocaleDateString('fr-FR')}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <p className="font-medium text-dark">{order.user?.firstName} {order.user?.lastName} <span className='text-xs text-gray-400'>({order.shippingName})</span></p>
-                                            <p className="text-xs text-gray-500">{order.user?.email}</p>
-                                        </td>
-                                        <td className="px-6 py-4 font-bold text-dark">
-                                            {order.total.toFixed(3)} TND
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className={`px-2 py-1 rounded-full text-xs font-bold ${getStatusColor(order.status)}`}>
-                                                {getStatusLabel(order.status)}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <Link
-                                                href={`/admin/orders/${order.id}`}
-                                                className="text-primary hover:underline text-sm font-medium"
-                                            >
-                                                Voir détails
-                                            </Link>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {isLoading ? (
+                                    <tr>
+                                        <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                                            Chargement...
                                         </td>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
+                                ) : filteredOrders.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                                            Aucune commande trouvée.
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    filteredOrders.map((order) => (
+                                        <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+                                            <td className="px-6 py-4 font-mono text-sm text-gray-600">
+                                                #{order.id.slice(0, 8)}...
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-gray-600">
+                                                {new Date(order.createdAt).toLocaleDateString('fr-FR')}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <p className="font-medium text-dark">{order.user?.firstName} {order.user?.lastName} <span className='text-xs text-gray-400'>({order.shippingName})</span></p>
+                                                <p className="text-xs text-gray-500">{order.user?.email}</p>
+                                            </td>
+                                            <td className="px-6 py-4 font-bold text-dark">
+                                                {order.total.toFixed(3)} TND
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className={`px-2 py-1 rounded-full text-xs font-bold ${getStatusColor(order.status)}`}>
+                                                    {getStatusLabel(order.status)}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <Link
+                                                    href={`/admin/orders/${order.id}`}
+                                                    className="text-primary hover:underline text-sm font-medium"
+                                                >
+                                                    Voir détails
+                                                </Link>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-        </div>
+            )
+            }
+        </div >
     );
 }

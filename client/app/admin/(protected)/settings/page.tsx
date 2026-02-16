@@ -7,6 +7,8 @@ import { getAllSettings, updateSetting } from '@/lib/api';
 export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState<'general' | 'shipping'>('general');
     const [isSaving, setIsSaving] = useState(false);
+    const [error, setError] = useState<string>('');
+    const [success, setSuccess] = useState<string>('');
 
     const [settings, setSettings] = useState({
         siteName: '',
@@ -20,6 +22,7 @@ export default function SettingsPage() {
     useEffect(() => {
         const fetchSettings = async () => {
             try {
+                setError('');
                 const data = await getAllSettings();
                 // data is array of { key, value, ... }
                 const newSettings = { ...settings };
@@ -46,8 +49,9 @@ export default function SettingsPage() {
                 if (hasChanges) {
                     setSettings(newSettings);
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Failed to load settings", error);
+                setError(error.message || 'Failed to load settings');
             }
         };
         fetchSettings();
@@ -63,6 +67,8 @@ export default function SettingsPage() {
 
     const handleSave = async () => {
         setIsSaving(true);
+        setError('');
+        setSuccess('');
         try {
             const keyMap: Record<string, string> = {
                 siteName: 'site_name',
@@ -82,10 +88,10 @@ export default function SettingsPage() {
             });
 
             await Promise.all(promises);
-            alert('Settings saved successfully!');
-        } catch (error) {
+            setSuccess('Settings saved successfully!');
+        } catch (error: any) {
             console.error('Failed to save settings', error);
-            alert('Failed to save settings');
+            setError(error.message || 'Failed to save settings');
         } finally {
             setIsSaving(false);
         }
@@ -94,6 +100,18 @@ export default function SettingsPage() {
     return (
         <div className="p-8">
             <h1 className="text-3xl font-bold mb-6">Settings</h1>
+
+            {error && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-red-600">
+                    <p className="font-medium">{error}</p>
+                </div>
+            )}
+
+            {success && (
+                <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 text-green-600">
+                    <p className="font-medium">{success}</p>
+                </div>
+            )}
 
             {/* Tabs */}
             <div className="border-b border-gray-200 mb-6">

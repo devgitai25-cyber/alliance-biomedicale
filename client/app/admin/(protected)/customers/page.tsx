@@ -9,6 +9,7 @@ export default function CustomersPage() {
     const [filter, setFilter] = useState<'all' | 'customers' | 'admins'>('all');
     const [sortBy, setSortBy] = useState<'newest' | 'orders'>('newest');
     const [searchTerm, setSearchTerm] = useState('');
+    const [error, setError] = useState<string>('');
 
     useEffect(() => {
         loadUsers();
@@ -16,11 +17,13 @@ export default function CustomersPage() {
 
     const loadUsers = async () => {
         try {
+            setIsLoading(true);
+            setError('');
             const data = await getUsers();
             setUsers(data);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to load users:', error);
-            alert('Failed to load users');
+            setError(error.message || 'Failed to load users');
         } finally {
             setIsLoading(false);
         }
@@ -125,8 +128,8 @@ export default function CustomersPage() {
                         <button
                             onClick={() => setFilter('all')}
                             className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-all ${filter === 'all'
-                                    ? 'bg-teal-main text-white shadow-md'
-                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                ? 'bg-teal-main text-white shadow-md'
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                 }`}
                         >
                             Tous
@@ -134,8 +137,8 @@ export default function CustomersPage() {
                         <button
                             onClick={() => setFilter('customers')}
                             className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-all ${filter === 'customers'
-                                    ? 'bg-teal-main text-white shadow-md'
-                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                ? 'bg-teal-main text-white shadow-md'
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                 }`}
                         >
                             Clients
@@ -146,100 +149,119 @@ export default function CustomersPage() {
                         <button
                             onClick={() => setFilter('admins')}
                             className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-all ${filter === 'admins'
-                                    ? 'bg-teal-main text-white shadow-md'
-                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                ? 'bg-teal-main text-white shadow-md'
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                 }`}
                         >
                             Administrateurs
-                            <span className="ml-2 bg-white/20 px-1.5 typeof rounded-full text-xs">
+                            <span className="ml-2 bg-white/20 px-1.5 rounded-full text-xs">
                                 {users.filter(u => u.isAdmin).length}
                             </span>
                         </button>
                     </div>
                 </div>
 
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead className="bg-gray-50/50 text-gray-500 font-medium text-xs uppercase tracking-wider">
-                            <tr>
-                                <th className="px-6 py-3">Utilisateur</th>
-                                <th className="px-6 py-3 hidden md:table-cell">Contact</th>
-                                <th className="px-6 py-3 text-center">Commandes</th>
-                                <th className="px-6 py-3">Rôle</th>
-                                <th className="px-6 py-3 text-right">Inscription</th>
-                                <th className="px-6 py-3 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                            {filteredUsers.length === 0 ? (
+                {error && (
+                    <div className="bg-red-50 border border-red-200 rounded-xl p-6 m-4 text-center">
+                        <div className="text-red-600 mb-3">
+                            <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <p className="font-medium">{error}</p>
+                        </div>
+                        <button
+                            onClick={loadUsers}
+                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                        >
+                            Retry
+                        </button>
+                    </div>
+                )}
+
+                {!error && (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead className="bg-gray-50/50 text-gray-500 font-medium text-xs uppercase tracking-wider">
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
-                                        <div className="flex flex-col items-center justify-center gap-2">
-                                            <span className="text-2xl">🔍</span>
-                                            <p>Aucun utilisateur trouvé</p>
-                                        </div>
-                                    </td>
+                                    <th className="px-6 py-3">Utilisateur</th>
+                                    <th className="px-6 py-3 hidden md:table-cell">Contact</th>
+                                    <th className="px-6 py-3 text-center">Commandes</th>
+                                    <th className="px-6 py-3">Rôle</th>
+                                    <th className="px-6 py-3 text-right">Inscription</th>
+                                    <th className="px-6 py-3 text-right">Actions</th>
                                 </tr>
-                            ) : (
-                                filteredUsers.map((user) => (
-                                    <tr key={user.id} className="hover:bg-gray-50/80 transition-colors group">
-                                        <td className="px-6 py-3">
-                                            <div className="flex items-center gap-3">
-                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shadow-sm ${user.isAdmin ? 'bg-purple-100 text-purple-700' : 'bg-teal-50 text-teal-700'
-                                                    }`}>
-                                                    {(user.firstName?.[0] || user.email[0]).toUpperCase()}
-                                                </div>
-                                                <div className="min-w-0">
-                                                    <p className="font-medium text-dark truncate">
-                                                        {user.firstName ? `${user.firstName} ${user.lastName}` : 'Client sans nom'}
-                                                    </p>
-                                                    <p className="text-xs text-gray-400 truncate md:hidden">{user.email}</p>
-                                                </div>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {filteredUsers.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                                            <div className="flex flex-col items-center justify-center gap-2">
+                                                <span className="text-2xl">🔍</span>
+                                                <p>Aucun utilisateur trouvé</p>
                                             </div>
-                                        </td>
-                                        <td className="px-6 py-3 hidden md:table-cell">
-                                            <div className="flex flex-col text-sm">
-                                                <span className="text-gray-700">{user.email}</span>
-                                                <span className="text-gray-400 text-xs">{user.phone || '-'}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-3 text-center">
-                                            <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-bold ${(user._count?.orders || 0) > 0
-                                                    ? 'bg-teal-50 text-teal-700 border border-teal-100'
-                                                    : 'bg-gray-100 text-gray-500'
-                                                }`}>
-                                                {user._count?.orders || 0}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-3">
-                                            {user.isAdmin ? (
-                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100">
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
-                                                    Admin
-                                                </span>
-                                            ) : (
-                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                                                    Client
-                                                </span>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-3 text-right text-sm text-gray-500">
-                                            {formatDate(user.createdAt)}
-                                        </td>
-                                        <td className="px-6 py-3 text-right">
-                                            <button className="text-gray-400 hover:text-teal-600 p-2 rounded-full hover:bg-teal-50 transition-colors">
-                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                                </svg>
-                                            </button>
                                         </td>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                                ) : (
+                                    filteredUsers.map((user) => (
+                                        <tr key={user.id} className="hover:bg-gray-50/80 transition-colors group">
+                                            <td className="px-6 py-3">
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shadow-sm ${user.isAdmin ? 'bg-purple-100 text-purple-700' : 'bg-teal-50 text-teal-700'
+                                                        }`}>
+                                                        {(user.firstName?.[0] || user.email[0]).toUpperCase()}
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <p className="font-medium text-dark truncate">
+                                                            {user.firstName ? `${user.firstName} ${user.lastName}` : 'Client sans nom'}
+                                                        </p>
+                                                        <p className="text-xs text-gray-400 truncate md:hidden">{user.email}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-3 hidden md:table-cell">
+                                                <div className="flex flex-col text-sm">
+                                                    <span className="text-gray-700">{user.email}</span>
+                                                    <span className="text-gray-400 text-xs">{user.phone || '-'}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-3 text-center">
+                                                <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-bold ${(user._count?.orders || 0) > 0
+                                                    ? 'bg-teal-50 text-teal-700 border border-teal-100'
+                                                    : 'bg-gray-100 text-gray-500'
+                                                    }`}>
+                                                    {user._count?.orders || 0}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-3">
+                                                {user.isAdmin ? (
+                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                                                        Admin
+                                                    </span>
+                                                ) : (
+                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                                                        Client
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td className="px-6 py-3 text-right text-sm text-gray-500">
+                                                {formatDate(user.createdAt)}
+                                            </td>
+                                            <td className="px-6 py-3 text-right">
+                                                <button className="text-gray-400 hover:text-teal-600 p-2 rounded-full hover:bg-teal-50 transition-colors">
+                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
         </div>
     );
