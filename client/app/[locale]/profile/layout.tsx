@@ -60,7 +60,6 @@ export default function ProfileLayout({
                                 <button
                                     onClick={() => {
                                         localStorage.removeItem('token');
-                                        localStorage.removeItem('user');
                                         window.location.href = `/${locale}/login`;
                                     }}
                                     className="w-full text-left px-4 py-2 text-red-500 hover:bg-red-50 rounded-lg mt-4 border-t pt-4"

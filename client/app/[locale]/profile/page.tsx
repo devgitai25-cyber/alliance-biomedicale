@@ -37,10 +37,11 @@ export default function ProfilePage() {
                 setLoading(true);
                 setError('');
 
-                // Load user from localStorage
-                const storedUser = localStorage.getItem('user');
-                if (storedUser) {
-                    setUser(JSON.parse(storedUser));
+                // Load user from token using helper function
+                const { getUser } = await import('@/lib/auth');
+                const userData = getUser();
+                if (userData) {
+                    setUser(userData);
                 }
 
                 // Fetch real orders from API

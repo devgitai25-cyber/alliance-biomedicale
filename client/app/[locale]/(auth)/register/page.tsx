@@ -88,9 +88,8 @@ export default function RegisterPage({ params }: { params: Promise<{ locale: str
                 throw new Error(data.message || 'Erreur lors de l\'inscription');
             }
 
-            // Auto-login (save token)
+            // Auto-login (save token only)
             localStorage.setItem('token', data.accessToken);
-            localStorage.setItem('user', JSON.stringify(data.user));
 
             const { locale } = await params;
             router.push(`/${locale}/profile`);

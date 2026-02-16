@@ -14,24 +14,21 @@ export default function ProtectedAdminLayout({ children }: { children: React.Rea
 
     useEffect(() => {
         // Simple client-side auth check
-        const storedUser = localStorage.getItem('user');
+        const { getUser } = require('@/lib/auth');
         const token = localStorage.getItem('token');
 
-        if (!storedUser || !token) {
+        if (!token) {
             router.push('/admin/login');
             return;
         }
 
-        try {
-            const parsedUser = JSON.parse(storedUser);
-            if (!parsedUser.isAdmin) {
-                router.push('/'); // Not admin
-                return;
-            }
-            setUser(parsedUser);
-        } catch (e) {
-            router.push('/admin/login');
+        const userData = getUser();
+        if (!userData || !userData.isAdmin) {
+            router.push('/'); // Not admin or invalid token
+            return;
         }
+
+        setUser(userData);
     }, [router]);
 
     if (!user) {
@@ -49,7 +46,6 @@ export default function ProtectedAdminLayout({ children }: { children: React.Rea
 
     const logout = () => {
         localStorage.removeItem('token');
-        localStorage.removeItem('user');
         router.push('/admin/login');
     };
 
@@ -165,8 +161,8 @@ export default function ProtectedAdminLayout({ children }: { children: React.Rea
                                             href={item.href}
                                             onClick={() => setMobileMenuOpen(false)}
                                             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive
-                                                    ? 'bg-teal-main text-white shadow-md'
-                                                    : 'text-gray-600 hover:bg-gray-50 hover:text-dark'
+                                                ? 'bg-teal-main text-white shadow-md'
+                                                : 'text-gray-600 hover:bg-gray-50 hover:text-dark'
                                                 }`}
                                         >
                                             <span className="text-xl">{item.icon}</span>

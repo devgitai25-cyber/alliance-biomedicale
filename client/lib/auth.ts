@@ -58,7 +58,6 @@ export function logout(): void {
     try {
         if (typeof window !== 'undefined') {
             localStorage.removeItem('token');
-            localStorage.removeItem('user');
         }
     } catch (error) {
         logError(error, 'logout');
@@ -76,26 +75,40 @@ export function getToken(): string | null {
     }
 }
 
+/**
+ * Get user data by decoding the JWT token
+ * This replaces the old getUser() that read from localStorage
+ */
 export function getUser(): User | null {
-    if (typeof window === 'undefined') return null;
-
-    const userStr = localStorage.getItem('user');
-    if (!userStr) return null;
+    const token = getToken();
+    if (!token) return null;
 
     try {
-        const user = JSON.parse(userStr);
+        const decoded = jwtDecode<JwtPayload>(token);
 
-        // Validate user object structure
-        if (!user.id || !user.email || typeof user.isAdmin !== 'boolean') {
-            logError('Invalid user data in localStorage', 'getUser');
-            localStorage.removeItem('user');
+        // Validate token expiration
+        const currentTime = Date.now() / 1000;
+        if (decoded.exp && decoded.exp < currentTime) {
+            logError('Token expired', 'getUser');
+            logout();
             return null;
         }
 
-        return user as User;
+        // Validate required fields
+        if (!decoded.sub || !decoded.email || typeof decoded.isAdmin !== 'boolean') {
+            logError('Invalid token payload', 'getUser');
+            logout();
+            return null;
+        }
+
+        return {
+            id: decoded.sub,
+            email: decoded.email,
+            isAdmin: decoded.isAdmin,
+        };
     } catch (error) {
         logError(error, 'getUser');
-        localStorage.removeItem('user'); // Clear corrupted data
+        logout();
         return null;
     }
 }

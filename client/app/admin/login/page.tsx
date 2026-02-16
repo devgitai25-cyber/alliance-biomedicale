@@ -23,7 +23,6 @@ export default function AdminLoginPage() {
 
             if (data.user.isAdmin) {
                 localStorage.setItem('token', data.accessToken);
-                localStorage.setItem('user', JSON.stringify(data.user));
                 router.push('/admin');
             } else {
                 setError('Accès non autorisé. Vous devez être administrateur.');
