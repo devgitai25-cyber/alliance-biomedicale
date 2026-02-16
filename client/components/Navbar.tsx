@@ -199,7 +199,7 @@ export function Navbar() {
                                     <div className="space-y-4">
                                         <div className="flex items-center gap-3 mb-4">
                                             <div className="w-10 h-10 rounded-full bg-teal-soft flex items-center justify-center text-teal-dark font-medium">
-                                                {user.firstName ? user.firstName[0] : 'U'}
+                                                {user.firstName && user.firstName.length > 0 ? user.firstName[0].toUpperCase() : 'U'}
                                             </div>
                                             <div>
                                                 <p className="font-medium text-dark">{user.firstName} {user.lastName}</p>
