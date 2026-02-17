@@ -56,8 +56,14 @@ export function TopLoader() {
                 return;
             }
 
-            // Skip if current path is the same
-            if (href === window.location.pathname + window.location.search) {
+            // Normalize paths for comparison (handle locale prefixes)
+            const currentPath = window.location.pathname;
+            const normalizedHref = href.replace(/^\//, '');
+            const normalizedCurrentPath = currentPath.replace(/^\/(fr|en|ar)?\/?/, '');
+
+            // Skip if navigating to the same page
+            if (normalizedHref === normalizedCurrentPath ||
+                (normalizedHref === '' && normalizedCurrentPath === '')) {
                 return;
             }
 
