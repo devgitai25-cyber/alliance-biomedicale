@@ -6,9 +6,7 @@ interface ContactPageProps {
     params: Promise<{ locale: string }>;
 }
 
-// Force dynamic rendering - no caching at all
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function ContactPage({ params }: ContactPageProps) {
     const { locale } = await params;
