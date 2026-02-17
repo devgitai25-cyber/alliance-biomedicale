@@ -462,7 +462,8 @@ export async function updateOrderStatus(
 // Settings
 export async function getPublicSettings(): Promise<Record<string, any>> {
     try {
-        const res = await fetch(`${API_URL}/settings/public`, { next: { revalidate: 300 } });
+        // No caching for testing - change back to { next: { revalidate: 300 } } after verification
+        const res = await fetch(`${API_URL}/settings/public`, { cache: 'no-store' });
         if (!res.ok) throw new Error('Failed to fetch settings');
         return res.json();
     } catch (error) {
