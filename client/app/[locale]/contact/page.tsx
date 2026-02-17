@@ -6,6 +6,9 @@ interface ContactPageProps {
     params: Promise<{ locale: string }>;
 }
 
+// Revalidate every 60 seconds to reflect settings updates
+export const revalidate = 60;
+
 export default async function ContactPage({ params }: ContactPageProps) {
     const { locale } = await params;
 

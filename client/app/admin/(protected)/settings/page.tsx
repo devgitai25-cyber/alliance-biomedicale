@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { getAllSettings, updateSetting } from '@/lib/api';
 
 export default function SettingsPage() {
-    const [activeTab, setActiveTab] = useState<'general' | 'shipping'>('general');
+    const [activeTab, setActiveTab] = useState<'general' | 'shipping' | 'hours'>('general');
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState<string>('');
     const [success, setSuccess] = useState<string>('');
@@ -169,6 +169,15 @@ export default function SettingsPage() {
                     >
                         Livraison
                     </button>
+                    <button
+                        onClick={() => setActiveTab('hours')}
+                        className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'hours'
+                            ? 'border-primary text-primary'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            }`}
+                    >
+                        Horaires
+                    </button>
 
                 </nav>
             </div>
@@ -229,50 +238,6 @@ export default function SettingsPage() {
                             <p className="text-xs text-gray-500 mt-1">Format: une ligne par élément d'adresse</p>
                         </div>
 
-                        {/* Opening Hours - User-friendly fields */}
-                        <div className="space-y-4 border-t pt-4">
-                            <h3 className="text-md font-medium text-gray-900">Horaires d'ouverture</h3>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Lundi - Vendredi
-                                </label>
-                                <input
-                                    type="text"
-                                    name="hoursWeekdays"
-                                    value={settings.hoursWeekdays}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                    placeholder="9:00 - 18:00"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Samedi
-                                </label>
-                                <input
-                                    type="text"
-                                    name="hoursSaturday"
-                                    value={settings.hoursSaturday}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                    placeholder="9:00 - 13:00"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Dimanche
-                                </label>
-                                <input
-                                    type="text"
-                                    name="hoursSunday"
-                                    value={settings.hoursSunday}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                    placeholder="Fermé"
-                                />
-                            </div>
-                        </div>
-
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Devise
@@ -327,6 +292,53 @@ export default function SettingsPage() {
                 </div>
             )}
 
+            {/* Hours Settings */}
+            {activeTab === 'hours' && (
+                <div className="bg-white rounded-lg shadow p-6 max-w-2xl">
+                    <h2 className="text-xl font-semibold mb-4">Horaires d'ouverture</h2>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Lundi - Vendredi
+                            </label>
+                            <input
+                                type="text"
+                                name="hoursWeekdays"
+                                value={settings.hoursWeekdays}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="9:00 - 18:00"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Samedi
+                            </label>
+                            <input
+                                type="text"
+                                name="hoursSaturday"
+                                value={settings.hoursSaturday}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="9:00 - 13:00"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Dimanche
+                            </label>
+                            <input
+                                type="text"
+                                name="hoursSunday"
+                                value={settings.hoursSunday}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="Fermé"
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Save Button */}
             <div className="mt-6">
