@@ -15,8 +15,9 @@ export default function SettingsPage() {
         siteEmail: '',
         sitePhone: '',
         siteAddress: '',
-        siteOpeningHours: '',
-        currency: 'TND',
+        hoursWeekdays: '',
+        hoursSaturday: '',
+        hoursSunday: '',
         shippingCost: 0,
         freeShippingThreshold: 0,
     });
@@ -36,10 +37,23 @@ export default function SettingsPage() {
                         site_email: 'siteEmail',
                         site_phone: 'sitePhone',
                         site_address: 'siteAddress',
-                        site_opening_hours: 'siteOpeningHours',
                         shipping_cost: 'shippingCost',
                         free_shipping_threshold: 'freeShippingThreshold',
                     };
+
+                    // Handle opening hours JSON parsing
+                    if (s.key === 'site_opening_hours' && s.value) {
+                        try {
+                            const hours = JSON.parse(s.value);
+                            newSettings.hoursWeekdays = hours.weekdays || '';
+                            newSettings.hoursSaturday = hours.saturday || '';
+                            newSettings.hoursSunday = hours.sunday || '';
+                            hasChanges = true;
+                            return;
+                        } catch (e) {
+                            console.error('Failed to parse opening hours:', e);
+                        }
+                    }
                     const stateKey = keyMap[s.key];
                     // @ts-ignore
                     if (stateKey && newSettings[stateKey] !== undefined) {
@@ -73,6 +87,23 @@ export default function SettingsPage() {
         setError('');
         setSuccess('');
         try {
+            // Convert separate hour fields back to JSON
+            const openingHoursJSON = JSON.stringify({
+                weekdays: settings.hoursWeekdays,
+                saturday: settings.hoursSaturday,
+                sunday: settings.hoursSunday
+            });
+
+            const settingsToSave = {
+                siteName: settings.siteName,
+                siteEmail: settings.siteEmail,
+                sitePhone: settings.sitePhone,
+                siteAddress: settings.siteAddress,
+                siteOpeningHours: openingHoursJSON,
+                shippingCost: settings.shippingCost,
+                freeShippingThreshold: settings.freeShippingThreshold,
+            };
+
             const keyMap: Record<string, string> = {
                 siteName: 'site_name',
                 siteEmail: 'site_email',
@@ -83,7 +114,7 @@ export default function SettingsPage() {
                 freeShippingThreshold: 'free_shipping_threshold',
             };
 
-            const promises = Object.entries(settings).map(([key, value]) => {
+            const promises = Object.entries(settingsToSave).map(([key, value]) => {
                 const backendKey = keyMap[key];
                 if (backendKey) {
                     return updateSetting(backendKey, value);
@@ -197,34 +228,62 @@ export default function SettingsPage() {
                             />
                             <p className="text-xs text-gray-500 mt-1">Format: une ligne par élément d'adresse</p>
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Horaires d'ouverture (JSON)
-                            </label>
-                            <textarea
-                                name="siteOpeningHours"
-                                value={settings.siteOpeningHours}
-                                onChange={(e) => setSettings(prev => ({ ...prev, siteOpeningHours: e.target.value }))}
-                                rows={4}
-                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-mono text-sm"
-                                placeholder='{"weekdays":"9:00 - 18:00","saturday":"9:00 - 13:00","sunday":"Fermé"}'
-                            />
-                            <p className="text-xs text-gray-500 mt-1">Format JSON avec clés: weekdays, saturday, sunday</p>
+
+                        {/* Opening Hours - User-friendly fields */}
+                        <div className="space-y-4 border-t pt-4">
+                            <h3 className="text-md font-medium text-gray-900">Horaires d'ouverture</h3>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Lundi - Vendredi
+                                </label>
+                                <input
+                                    type="text"
+                                    name="hoursWeekdays"
+                                    value={settings.hoursWeekdays}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                    placeholder="9:00 - 18:00"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Samedi
+                                </label>
+                                <input
+                                    type="text"
+                                    name="hoursSaturday"
+                                    value={settings.hoursSaturday}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                    placeholder="9:00 - 13:00"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Dimanche
+                                </label>
+                                <input
+                                    type="text"
+                                    name="hoursSunday"
+                                    value={settings.hoursSunday}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                    placeholder="Fermé"
+                                />
+                            </div>
                         </div>
+
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Devise
                             </label>
-                            <select
-                                name="currency"
-                                value={settings.currency}
-                                onChange={(e) => setSettings(prev => ({ ...prev, currency: e.target.value }))}
-                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                            >
-                                <option value="TND">Dinar Tunisien (TND)</option>
-                                <option value="EUR">Euro (EUR)</option>
-                                <option value="USD">Dollar Américain (USD)</option>
-                            </select>
+                            <input
+                                type="text"
+                                value="Dinar Tunisien (TND)"
+                                disabled
+                                className="w-full px-4 py-2 border rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">La devise ne peut pas être modifiée</p>
                         </div>
                     </div>
                 </div>
