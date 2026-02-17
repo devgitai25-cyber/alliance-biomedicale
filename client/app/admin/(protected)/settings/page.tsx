@@ -114,15 +114,14 @@ export default function SettingsPage() {
                 freeShippingThreshold: 'free_shipping_threshold',
             };
 
-            const promises = Object.entries(settingsToSave).map(([key, value]) => {
+            // Send requests sequentially to avoid rate limiting
+            for (const [key, value] of Object.entries(settingsToSave)) {
                 const backendKey = keyMap[key];
                 if (backendKey) {
-                    return updateSetting(backendKey, value);
+                    await updateSetting(backendKey, value);
                 }
-                return Promise.resolve();
-            });
+            }
 
-            await Promise.all(promises);
             setSuccess('Paramètres enregistrés avec succès !');
         } catch (error: any) {
             console.error('Failed to save settings', error);
