@@ -14,6 +14,8 @@ export default function SettingsPage() {
         siteName: '',
         siteEmail: '',
         sitePhone: '',
+        siteAddress: '',
+        siteOpeningHours: '',
         currency: 'TND',
         shippingCost: 0,
         freeShippingThreshold: 0,
@@ -33,9 +35,10 @@ export default function SettingsPage() {
                         site_name: 'siteName',
                         site_email: 'siteEmail',
                         site_phone: 'sitePhone',
+                        site_address: 'siteAddress',
+                        site_opening_hours: 'siteOpeningHours',
                         shipping_cost: 'shippingCost',
                         free_shipping_threshold: 'freeShippingThreshold',
-
                     };
                     const stateKey = keyMap[s.key];
                     // @ts-ignore
@@ -74,9 +77,10 @@ export default function SettingsPage() {
                 siteName: 'site_name',
                 siteEmail: 'site_email',
                 sitePhone: 'site_phone',
+                siteAddress: 'site_address',
+                siteOpeningHours: 'site_opening_hours',
                 shippingCost: 'shipping_cost',
                 freeShippingThreshold: 'free_shipping_threshold',
-
             };
 
             const promises = Object.entries(settings).map(([key, value]) => {
@@ -178,6 +182,34 @@ export default function SettingsPage() {
                                 onChange={handleChange}
                                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                             />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Adresse complète
+                            </label>
+                            <textarea
+                                name="siteAddress"
+                                value={settings.siteAddress}
+                                onChange={(e) => setSettings(prev => ({ ...prev, siteAddress: e.target.value }))}
+                                rows={3}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="Nom de l'entreprise&#10;Rue&#10;Code postal Ville, Pays"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Format: une ligne par élément d'adresse</p>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Horaires d'ouverture (JSON)
+                            </label>
+                            <textarea
+                                name="siteOpeningHours"
+                                value={settings.siteOpeningHours}
+                                onChange={(e) => setSettings(prev => ({ ...prev, siteOpeningHours: e.target.value }))}
+                                rows={4}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-mono text-sm"
+                                placeholder='{"weekdays":"9:00 - 18:00","saturday":"9:00 - 13:00","sunday":"Fermé"}'
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Format JSON avec clés: weekdays, saturday, sunday</p>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">

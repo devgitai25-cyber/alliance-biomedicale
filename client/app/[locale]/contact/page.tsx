@@ -1,5 +1,6 @@
 import { Container } from '@/components/ui/Container';
 import ContactForm from './ContactForm';
+import { getPublicSettings } from '@/lib/api';
 
 interface ContactPageProps {
     params: Promise<{ locale: string }>;
@@ -7,6 +8,26 @@ interface ContactPageProps {
 
 export default async function ContactPage({ params }: ContactPageProps) {
     const { locale } = await params;
+
+    // Fetch public settings
+    const settings = await getPublicSettings();
+    const siteEmail = settings.site_email || 'contact@alliance-biomedicale.com';
+    const sitePhone = settings.site_phone || '+216 71 000 000';
+    const siteAddress = settings.site_address || 'Alliance Biomédicale\n123 Rue de la Nature\n1000 Tunis, Tunisie';
+
+    // Parse opening hours JSON
+    let openingHours = {
+        weekdays: '9:00 - 18:00',
+        saturday: '9:00 - 13:00',
+        sunday: 'Fermé'
+    };
+    try {
+        if (settings.site_opening_hours) {
+            openingHours = JSON.parse(settings.site_opening_hours);
+        }
+    } catch (e) {
+        console.error('Failed to parse opening hours:', e);
+    }
 
     return (
         <div className="bg-white min-h-screen">
@@ -37,10 +58,8 @@ export default async function ContactPage({ params }: ContactPageProps) {
                                 </svg>
                                 Notre Adresse
                             </h2>
-                            <p className="text-gray-text font-body leading-relaxed">
-                                Alliance Biomédicale<br />
-                                123 Rue de la Nature<br />
-                                1000 Tunis, Tunisie
+                            <p className="text-gray-text font-body leading-relaxed whitespace-pre-line">
+                                {siteAddress}
                             </p>
                         </div>
 
@@ -55,14 +74,14 @@ export default async function ContactPage({ params }: ContactPageProps) {
                             <div className="space-y-4">
                                 <p className="text-gray-text font-body flex items-start gap-3">
                                     <span className="font-medium text-teal-dark min-w-[100px]">Téléphone:</span>
-                                    <a href="tel:+21671000000" className="hover:text-teal-main transition-colors">
-                                        +216 71 000 000
+                                    <a href={`tel:${sitePhone.replace(/\s/g, '')}`} className="hover:text-teal-main transition-colors">
+                                        {sitePhone}
                                     </a>
                                 </p>
                                 <p className="text-gray-text font-body flex items-start gap-3">
                                     <span className="font-medium text-teal-dark min-w-[100px]">Email:</span>
-                                    <a href="mailto:contact@alliance-biomedicale.com" className="hover:text-teal-main transition-colors">
-                                        contact@alliance-biomedicale.com
+                                    <a href={`mailto:${siteEmail}`} className="hover:text-teal-main transition-colors">
+                                        {siteEmail}
                                     </a>
                                 </p>
                             </div>
@@ -79,15 +98,15 @@ export default async function ContactPage({ params }: ContactPageProps) {
                             <ul className="space-y-3 text-gray-text font-body">
                                 <li className="flex justify-between">
                                     <span>Lundi - Vendredi:</span>
-                                    <span className="font-medium text-teal-dark">9:00 - 18:00</span>
+                                    <span className="font-medium text-teal-dark">{openingHours.weekdays}</span>
                                 </li>
                                 <li className="flex justify-between">
                                     <span>Samedi:</span>
-                                    <span className="font-medium text-teal-dark">9:00 - 13:00</span>
+                                    <span className="font-medium text-teal-dark">{openingHours.saturday}</span>
                                 </li>
                                 <li className="flex justify-between text-gray-medium">
                                     <span>Dimanche:</span>
-                                    <span>Fermé</span>
+                                    <span>{openingHours.sunday}</span>
                                 </li>
                             </ul>
                         </div>

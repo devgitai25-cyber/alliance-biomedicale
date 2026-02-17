@@ -578,6 +578,22 @@ async function main() {
             isPublic: true,
         },
         {
+            key: 'site_address',
+            value: 'Alliance Biomédicale\n123 Rue de la Nature\n1000 Tunis, Tunisie',
+            description: 'Adresse physique complète',
+            isPublic: true,
+        },
+        {
+            key: 'site_opening_hours',
+            value: JSON.stringify({
+                weekdays: '9:00 - 18:00',
+                saturday: '9:00 - 13:00',
+                sunday: 'Fermé'
+            }),
+            description: 'Horaires d\'ouverture (JSON)',
+            isPublic: true,
+        },
+        {
             key: 'paymee_api_key',
             value: '',
             description: 'Clé API Paymee (Privé)',
